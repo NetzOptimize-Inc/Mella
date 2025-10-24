@@ -1,0 +1,19 @@
+image: ubuntu:18.04
+
+before_script:
+  - chmod +x ./setup-build-env.sh
+  - ./setup-build-env.sh
+
+stages:
+  - build
+
+compile:
+  stage: build
+  tags:
+    - docker
+  script:
+    - arduino-cli compile --fqbn esp8266:esp8266:generic:xtal=80,vt=flash,exception=disabled,ssl=all,ResetMethod=ck,CrystalFreq=26,FlashFreq=40,FlashMode=dout,eesz=4M,led=2,sdk=nonosdk221,ip=lm2f,dbg=Disabled,lvl=None____,wipe=none,baud=115200 -v -o MellaFirmware.bin MellaFirmware.ino
+  artifacts:
+    paths:
+    - MellaFirmware.bin
+    expire_in: 1 month
