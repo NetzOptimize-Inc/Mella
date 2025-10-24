@@ -49,13 +49,13 @@ int Connection_Counter = 0;
 bool MQTT_Status = 0;
 
 // Mqtt Server Address
-const char* mqttServer = "167.71.112.166";
+const char* mqttServer = "167.71.112.188";
 
 // Mqtt Server Port
 const int mqttPort = 1883;
 
 // Credentials to connect
-const char* mqttUser = "themella";
+const char* mqttUser = "thenetzoptimize";
 const char* mqttPassword = "!@#mqtt";
 
 //strDateTime dateTime;
