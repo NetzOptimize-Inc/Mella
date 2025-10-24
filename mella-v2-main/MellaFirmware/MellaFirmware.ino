@@ -61,8 +61,8 @@ bool MQTT_Status = 0;
 const char* mqttServer = "167.95.122.183";
 
 const int mqttPort = 1883;
-const char* mqttUser = "userProject";
-const char* mqttPassword = "!Password$$";
+const char* mqttUser = "user";
+const char* mqttPassword = "Password$$";
 
 WiFiUDP Udp;
 unsigned int localPort = 8888; 
