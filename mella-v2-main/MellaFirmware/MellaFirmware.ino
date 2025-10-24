@@ -340,6 +340,7 @@ void startBLEConfig() {
 }
 
 void readCB (BLECharacteristic* chr, uint8_t connID) {
+    (void)connID;  // suppress unused parameter warning
     Serial.print("Characteristic ");
     Serial.print(chr->getUUID().str());
     Serial.print(" read by connection ");
@@ -347,6 +348,7 @@ void readCB (BLECharacteristic* chr, uint8_t connID) {
 }
 
 void writeCB (BLECharacteristic* chr, uint8_t connID) {
+    (void) connID;
     Serial.print("Characteristic ");
     Serial.print(" write by connection ");
     DEBUG_PRINTLN(connID);
@@ -389,6 +391,7 @@ void writeCB (BLECharacteristic* chr, uint8_t connID) {
 }
 
 void notifCB(BLECharacteristic* chr, uint8_t connID, uint16_t cccd) {
+    (void) connID;
     if (cccd & GATT_CLIENT_CHAR_CONFIG_NOTIFY) {
         Serial.print("Notifications enabled on Characteristic");
         notify = true;
@@ -706,6 +709,7 @@ void printWifiStatus() {
   Serial.print("SSID: ");
   DEBUG_PRINTLN(WiFi.SSID());
   IPAddress ip = WiFi.localIP();
+  (void)ip;
   Serial.print("IP Address: ");
   DEBUG_PRINTLN(ip);
   long rssi = WiFi.RSSI();
