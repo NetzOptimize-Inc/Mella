@@ -58,11 +58,11 @@ String publish_debug = "003915A1/Debug";
 int check_update = 1;
 bool MQTT_Status = 0;
 
-const char* mqttServer = "167.71.112.166";
+const char* mqttServer = "167.95.122.183";
 
 const int mqttPort = 1883;
-const char* mqttUser = "themella";
-const char* mqttPassword = "!@#mqtt";
+const char* mqttUser = "userProject";
+const char* mqttPassword = "!Password$$";
 
 WiFiUDP Udp;
 unsigned int localPort = 8888; 
@@ -274,7 +274,7 @@ bool connectToWiFi(String ssid, String password) {
   while (WiFi.status() != WL_CONNECTED && millis() - start < 20000) {
     Serial.print(".");
     dots++;
-    if (dots % 40 == 0) DEBUG_PRINTLN(); // New line every 40 dots
+    if (dots % 40 == 0) { DEBUG_PRINTLN(); } // New line every 40 dots
     delay(500);
   }
   
