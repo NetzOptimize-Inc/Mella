@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context=".activity.SubscriptionsActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_30sdp"
+        android:gravity="center"
+        android:text="Please Choose a Subscription Option"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_14sdp" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/tv_restore_subscription"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:gravity="center"
+        android:text="Restore Existing Subscription"
+        android:textColor="@color/appBlue1"
+        android:textSize="@dimen/_14sdp" />
+
+    <TextView
+        android:id="@+id/tv_annually_subscription"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:gravity="center"
+        android:text="Connect to My Mella - 1 Year"
+        android:textColor="@color/appBlue1"
+        android:textSize="@dimen/_14sdp" />
+
+    <TextView
+        android:id="@+id/tv_monthly_subscription"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:gravity="center"
+        android:text="Connect to My Mella - 1 Month"
+        android:textColor="@color/appBlue1"
+        android:textSize="@dimen/_14sdp" />
+
+    <TextView
+        android:id="@+id/tv_terms"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:gravity="center"
+        android:text="Terms of Service"
+        android:textColor="@color/appBlue1"
+        android:textSize="@dimen/_14sdp" />
+
+    <TextView
+        android:id="@+id/tv_privacy"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:layout_marginBottom="@dimen/_20sdp"
+        android:gravity="center"
+        android:text="Privacy Policy"
+        android:textColor="@color/appBlue1"
+        android:textSize="@dimen/_14sdp" />
+
+    <TextView
+        android:id="@+id/tv_version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/_20sdp"
+        android:gravity="center"
+        android:text="Version: 1.0(1)"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_10sdp" />
+
+</LinearLayout>

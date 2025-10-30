@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">The Mella</string>
+    <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
+    <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
+
+    <string name="title_activity_splash">The Mella</string>
+    <string name="send_email_link">Send Email Link</string>
+    <string name="lbl_login">Login</string>
+    <string name="status_on">ON</string>
+    <string name="status_off">OFF</string>
+    <string name="register">Register</string>
+
+</resources>

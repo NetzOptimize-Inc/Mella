@@ -1,0 +1,42 @@
+apply plugin: 'com.android.library'
+ext {
+    PUBLISH_ARTIFACT_ID = "paho.mqtt.android"
+    PUBLISH_VERSION = "1.1.2"
+    PUBLISH_GROUP_ID = 'io.github.mayzs'
+    GITHUB_URL = "https://github.com/mayzs/paho.mqtt.android"// github url
+    GITHUB_CLONE_URL = "https://github.com/mayzs/paho.mqtt.android.git" // github clone url
+    GITHUB_BRANCHE_URL = "https://github.com/mayzs/paho.mqtt.android/tree/master"
+    // github branch url
+    PROJECT_NAME = "paho.mqtt.android"
+    PROJECT_DESCRIPTION = "eclipse paho mqtt android，support AndroidX, Android 14"
+}
+
+// apply from: 'publish.gradle'
+android {
+    compileSdk 34
+
+    namespace 'mqtt'
+    defaultConfig {
+        minSdk 23
+        targetSdk 34
+
+        testApplicationId "mqtt.test"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5"
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+}

@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "965140418096",
+    "firebase_url": "https://themella-c4e13.firebaseio.com",
+    "project_id": "themella-c4e13",
+    "storage_bucket": "themella-c4e13.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:965140418096:android:ce4b4120763c1553a427f5",
+        "android_client_info": {
+          "package_name": "com.april.themellaapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "965140418096-idhuf60b4qafrtkra51k2it1am9sgpml.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.april.themellaapp",
+            "certificate_hash": "d96f635c084125fe582bc510eaa65596c1bba9a9"
+          }
+        },
+        {
+          "client_id": "965140418096-jq756brrvv1fggf674b9kbjbh7vhke5m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.april.themellaapp",
+            "certificate_hash": "b30265a599e90e19bb2021c2e33a1f9f3dd035c1"
+          }
+        },
+        {
+          "client_id": "965140418096-mn0nqsas8i5pi0a8ftc2dn9ldl7qhfob.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.april.themellaapp",
+            "certificate_hash": "c674fc3808670cde4020c13ff93aeb26c0343a9d"
+          }
+        },
+        {
+          "client_id": "965140418096-b0v0k8lsff8sukh3jegeintg5qg8oph4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfMJRUoGA7jW3dRUHxFg6hcljgcYBiFMI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "965140418096-b0v0k8lsff8sukh3jegeintg5qg8oph4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "965140418096-6mlvrfplf5as3lim5efc7c2a5qmpphop.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.themella.mella"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
