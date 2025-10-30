@@ -1,0 +1,994 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 52;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0EF98C8654440B88440DD860 /* Pods_The_Mella.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D3015BA990105A55CB68F71 /* Pods_The_Mella.framework */; };
+		3840EAEE20C14AA700171001 /* done.png in Resources */ = {isa = PBXBuildFile; fileRef = 3840EAED20C14AA600171001 /* done.png */; };
+		3851E94120BD745100492308 /* libEsptouch_v0.3.5.3 in Frameworks */ = {isa = PBXBuildFile; fileRef = 3851E94020BD745100492308 /* libEsptouch_v0.3.5.3 */; settings = {ATTRIBUTES = (Required, ); }; };
+		385B7C38219BF74B00FA550E /* edit.png in Resources */ = {isa = PBXBuildFile; fileRef = 385B7C37219BF74A00FA550E /* edit.png */; };
+		385E96BE215CAFB100A3BA8C /* appicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 385E96BD215CAFB100A3BA8C /* appicon.png */; };
+		385EBDD6216E74C900E09892 /* splash.png in Resources */ = {isa = PBXBuildFile; fileRef = 385EBDD5216E74C900E09892 /* splash.png */; };
+		38805BBE20BAD1BA00E58355 /* TimerTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38805BBD20BAD1BA00E58355 /* TimerTableCell.swift */; };
+		389D2E2F20B6A8B000221C45 /* FirebaseCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 389D2E2E20B6A8B000221C45 /* FirebaseCore.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		38ACD9B020B6916D0038EA58 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38ACD9AF20B6916D0038EA58 /* AppDelegate.swift */; };
+		38ACD9B220B6916D0038EA58 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38ACD9B120B6916D0038EA58 /* FirstViewController.swift */; };
+		38ACD9B520B6916D0038EA58 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38ACD9B320B6916D0038EA58 /* Main.storyboard */; };
+		38ACD9B720B6916F0038EA58 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 38ACD9B620B6916F0038EA58 /* Assets.xcassets */; };
+		38ACD9BA20B6916F0038EA58 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38ACD9B820B6916F0038EA58 /* LaunchScreen.storyboard */; };
+		38B6024D20BD9E8500B57EB0 /* scan_qr_code.png in Resources */ = {isa = PBXBuildFile; fileRef = 38B6024A20BD9E8400B57EB0 /* scan_qr_code.png */; };
+		38B6024E20BD9E8500B57EB0 /* setup_device.png in Resources */ = {isa = PBXBuildFile; fileRef = 38B6024B20BD9E8400B57EB0 /* setup_device.png */; };
+		38B6024F20BD9E8500B57EB0 /* logout.png in Resources */ = {isa = PBXBuildFile; fileRef = 38B6024C20BD9E8400B57EB0 /* logout.png */; };
+		38BA14DF20BD6E4F0016D203 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BA14DE20BD6E4F0016D203 /* SettingViewController.swift */; };
+		38C4DB7720B7FC130076BAA8 /* logo.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 38C4DB7620B7FC130076BAA8 /* logo.PNG */; };
+		38C4DB7920B811970076BAA8 /* mainpagelogo.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 38C4DB7820B811970076BAA8 /* mainpagelogo.PNG */; };
+		38C4DB7B20B8120C0076BAA8 /* disable_button.png in Resources */ = {isa = PBXBuildFile; fileRef = 38C4DB7A20B8120C0076BAA8 /* disable_button.png */; };
+		38C4DB7E20B8121D0076BAA8 /* off_button.png in Resources */ = {isa = PBXBuildFile; fileRef = 38C4DB7C20B8121C0076BAA8 /* off_button.png */; };
+		38C4DB7F20B8121D0076BAA8 /* on_button.png in Resources */ = {isa = PBXBuildFile; fileRef = 38C4DB7D20B8121D0076BAA8 /* on_button.png */; };
+		38C81F0620B983420049D19F /* time_btn.png in Resources */ = {isa = PBXBuildFile; fileRef = 38C81F0520B983410049D19F /* time_btn.png */; };
+		38C81F0820B9E9E90049D19F /* setting_btn.png in Resources */ = {isa = PBXBuildFile; fileRef = 38C81F0720B9E9E90049D19F /* setting_btn.png */; };
+		38C81F0A20B9F5C20049D19F /* TimerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38C81F0920B9F5C20049D19F /* TimerViewController.swift */; };
+		38C8B920215D1D8700D17551 /* delete.png in Resources */ = {isa = PBXBuildFile; fileRef = 38C8B91F215D1D8600D17551 /* delete.png */; };
+		38CFEDF0215E2B510035C6DF /* CheckUpdateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38CFEDEF215E2B510035C6DF /* CheckUpdateViewController.swift */; };
+		38D7C2042157BA5900CFAF07 /* GetWiFi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38D7C2032157BA5800CFAF07 /* GetWiFi.swift */; };
+		38D7C2062157C4B300CFAF07 /* DeviceListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38D7C2052157C4B300CFAF07 /* DeviceListViewController.swift */; };
+		38D8363920B6CFC4008276E3 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38D8363820B6CFC4008276E3 /* LoginViewController.swift */; };
+		38D8363B20B6D489008276E3 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38D8363A20B6D489008276E3 /* HomeViewController.swift */; };
+		38E0EBAE215A18500095DAC3 /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38E0EBAD215A18500095DAC3 /* DeviceTableViewCell.swift */; };
+		AC24B23A22F22A24007956AE /* IAPHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC24B23922F22A24007956AE /* IAPHelper.swift */; };
+		AC8AA4D924538E9C00F1C81A /* AddDeviceWizard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8AA4D824538E9C00F1C81A /* AddDeviceWizard.swift */; };
+		AC8AA4DB2453968F00F1C81A /* DeviceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8AA4DA2453968F00F1C81A /* DeviceModel.swift */; };
+		AC8AA4DE24539FB500F1C81A /* CarBode in Frameworks */ = {isa = PBXBuildFile; productRef = AC8AA4DD24539FB500F1C81A /* CarBode */; };
+		AC8C7BB1236CAE5600A7594D /* opensslconf.h.orig in Resources */ = {isa = PBXBuildFile; fileRef = AC8C7B51236CAE5600A7594D /* opensslconf.h.orig */; };
+		AC8C7BB2236CAE5600A7594D /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AC8C7BA9236CAE5600A7594D /* libcrypto.a */; };
+		AC8C7BB3236CAE5600A7594D /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AC8C7BAA236CAE5600A7594D /* libssl.a */; };
+		AC8C7BB4236CAE5600A7594D /* IAPReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8C7BAC236CAE5600A7594D /* IAPReceipt.swift */; };
+		AC8C7BB5236CAE5600A7594D /* Receipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8C7BAD236CAE5600A7594D /* Receipt.swift */; };
+		AC8C7BB6236CAE5600A7594D /* ASN1Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8C7BAE236CAE5600A7594D /* ASN1Helpers.swift */; };
+		AC8C7BB7236CAE5600A7594D /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = AC8C7BB0236CAE5600A7594D /* AppleIncRootCertificate.cer */; };
+		AC91366D22F0AEBC00DE4ABF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AC91366C22F0AEBC00DE4ABF /* GoogleService-Info.plist */; };
+		AC91367122F0F46300DE4ABF /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC91367022F0F46300DE4ABF /* StoreKit.framework */; };
+		ACF1F56E245662FF00BBE2F7 /* WizardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF1F56D245662FF00BBE2F7 /* WizardViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		001DD50B18E14D5F493F7882 /* Pods-TheMellaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMellaTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-The MellaTests/Pods-TheMellaTests.release.xcconfig"; sourceTree = "<group>"; };
+		0477BABE40336E693BBE0A24 /* Pods-The Mella.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-The Mella.release.xcconfig"; path = "Pods/Target Support Files/Pods-The Mella/Pods-The Mella.release.xcconfig"; sourceTree = "<group>"; };
+		05A7E6931DD3AA4A51B4D8A3 /* Pods-TheMellaUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMellaUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-The MellaUITests/Pods-TheMellaUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		09F4641DAF65F8EF66966A63 /* Pods-The MellaUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-The MellaUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-The MellaUITests/Pods-The MellaUITests.release.xcconfig"; sourceTree = "<group>"; };
+		163D805E327CD3328668FD11 /* Pods_TheMella.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TheMella.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C99E5D5B17563BE22AAA818 /* Pods-The MellaUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-The MellaUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-The MellaUITests/Pods-The MellaUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		2F2E141239F186B1677E63F6 /* Pods-The Mella.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-The Mella.debug.xcconfig"; path = "Pods/Target Support Files/Pods-The Mella/Pods-The Mella.debug.xcconfig"; sourceTree = "<group>"; };
+		2FFB052DBDBABBE1F706A542 /* Pods-The MellaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-The MellaTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-The MellaTests/Pods-The MellaTests.debug.xcconfig"; sourceTree = "<group>"; };
+		3840EAED20C14AA600171001 /* done.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = done.png; sourceTree = SOURCE_ROOT; };
+		3851E94020BD745100492308 /* libEsptouch_v0.3.5.3 */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libEsptouch_v0.3.5.3; sourceTree = "<group>"; };
+		3851E94220BD746C00492308 /* ESPTouchResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ESPTouchResult.h; sourceTree = "<group>"; };
+		3851E94320BD746C00492308 /* ESPTouchTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ESPTouchTask.h; sourceTree = "<group>"; };
+		3851E94420BD746C00492308 /* ESPTouchDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ESPTouchDelegate.h; sourceTree = "<group>"; };
+		3851E94620BD764C00492308 /* TheMella-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TheMella-Bridging-Header.h"; sourceTree = "<group>"; };
+		385B7C37219BF74A00FA550E /* edit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edit.png; sourceTree = SOURCE_ROOT; };
+		385E96BD215CAFB100A3BA8C /* appicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = appicon.png; sourceTree = SOURCE_ROOT; };
+		385EBDD5216E74C900E09892 /* splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash.png; sourceTree = SOURCE_ROOT; };
+		387BFC172166213F003C6DD4 /* The Mella.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "The Mella.entitlements"; sourceTree = "<group>"; };
+		38805BBD20BAD1BA00E58355 /* TimerTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerTableCell.swift; sourceTree = "<group>"; };
+		389D2E2E20B6A8B000221C45 /* FirebaseCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		38ACD9AC20B6916D0038EA58 /* The Mella.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "The Mella.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		38ACD9AF20B6916D0038EA58 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		38ACD9B120B6916D0038EA58 /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
+		38ACD9B420B6916D0038EA58 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		38ACD9B620B6916F0038EA58 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		38ACD9B920B6916F0038EA58 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		38ACD9BB20B6916F0038EA58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		38B6024A20BD9E8400B57EB0 /* scan_qr_code.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = scan_qr_code.png; sourceTree = SOURCE_ROOT; };
+		38B6024B20BD9E8400B57EB0 /* setup_device.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = setup_device.png; sourceTree = SOURCE_ROOT; };
+		38B6024C20BD9E8400B57EB0 /* logout.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logout.png; sourceTree = SOURCE_ROOT; };
+		38BA14DE20BD6E4F0016D203 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
+		38C4DB7620B7FC130076BAA8 /* logo.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.PNG; sourceTree = SOURCE_ROOT; };
+		38C4DB7820B811970076BAA8 /* mainpagelogo.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mainpagelogo.PNG; sourceTree = SOURCE_ROOT; };
+		38C4DB7A20B8120C0076BAA8 /* disable_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = disable_button.png; sourceTree = SOURCE_ROOT; };
+		38C4DB7C20B8121C0076BAA8 /* off_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = off_button.png; sourceTree = SOURCE_ROOT; };
+		38C4DB7D20B8121D0076BAA8 /* on_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = on_button.png; sourceTree = SOURCE_ROOT; };
+		38C81F0520B983410049D19F /* time_btn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = time_btn.png; sourceTree = SOURCE_ROOT; };
+		38C81F0720B9E9E90049D19F /* setting_btn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = setting_btn.png; sourceTree = SOURCE_ROOT; };
+		38C81F0920B9F5C20049D19F /* TimerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerViewController.swift; sourceTree = "<group>"; };
+		38C8B91F215D1D8600D17551 /* delete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = delete.png; sourceTree = SOURCE_ROOT; };
+		38CFEDEF215E2B510035C6DF /* CheckUpdateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckUpdateViewController.swift; sourceTree = "<group>"; };
+		38D7C2032157BA5800CFAF07 /* GetWiFi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GetWiFi.swift; path = TheMella/ESPtouch/GetWiFi.swift; sourceTree = SOURCE_ROOT; };
+		38D7C2052157C4B300CFAF07 /* DeviceListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListViewController.swift; sourceTree = "<group>"; };
+		38D8363820B6CFC4008276E3 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		38D8363A20B6D489008276E3 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		38E0EBAD215A18500095DAC3 /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTableViewCell.swift; sourceTree = "<group>"; };
+		3D3015BA990105A55CB68F71 /* Pods_The_Mella.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_The_Mella.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D91A2AE82CD7F1746CE6FAF /* Pods-TheMella.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMella.release.xcconfig"; path = "Pods/Target Support Files/Pods-TheMella/Pods-TheMella.release.xcconfig"; sourceTree = "<group>"; };
+		439AF9E656DA0986B7CEE519 /* Pods-TheMella.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMella.debug.xcconfig"; path = "Pods/Target Support Files/Pods-The Mella/Pods-TheMella.debug.xcconfig"; sourceTree = "<group>"; };
+		5403CE0C6489D41AC4BD50A8 /* Pods-TheMellaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMellaTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TheMellaTests/Pods-TheMellaTests.debug.xcconfig"; sourceTree = "<group>"; };
+		6A7073FD616848226E6CE4DB /* Pods-TheMellaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMellaTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-The MellaTests/Pods-TheMellaTests.debug.xcconfig"; sourceTree = "<group>"; };
+		7C1DC5AE75FC558FCDA64F85 /* Pods-TheMellaUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMellaUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TheMellaUITests/Pods-TheMellaUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		88FC1760654AAD335CD27B95 /* Pods_TheMellaUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TheMellaUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F7844242AFC6114737C6097 /* Pods-TheMellaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMellaTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-TheMellaTests/Pods-TheMellaTests.release.xcconfig"; sourceTree = "<group>"; };
+		A5553AE07D26FA46E8205AA0 /* Pods-The MellaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-The MellaTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-The MellaTests/Pods-The MellaTests.release.xcconfig"; sourceTree = "<group>"; };
+		AC24B23922F22A24007956AE /* IAPHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPHelper.swift; sourceTree = "<group>"; };
+		AC8AA4D824538E9C00F1C81A /* AddDeviceWizard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDeviceWizard.swift; sourceTree = "<group>"; };
+		AC8AA4DA2453968F00F1C81A /* DeviceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceModel.swift; sourceTree = "<group>"; };
+		AC8C7B3E236CAE5600A7594D /* pem2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pem2.h; sourceTree = "<group>"; };
+		AC8C7B3F236CAE5600A7594D /* kdf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kdf.h; sourceTree = "<group>"; };
+		AC8C7B40236CAE5600A7594D /* pem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pem.h; sourceTree = "<group>"; };
+		AC8C7B41236CAE5600A7594D /* asyncerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asyncerr.h; sourceTree = "<group>"; };
+		AC8C7B42236CAE5600A7594D /* md2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md2.h; sourceTree = "<group>"; };
+		AC8C7B43236CAE5600A7594D /* ssl3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssl3.h; sourceTree = "<group>"; };
+		AC8C7B44236CAE5600A7594D /* ossl_typ.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ossl_typ.h; sourceTree = "<group>"; };
+		AC8C7B45236CAE5600A7594D /* dtls1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dtls1.h; sourceTree = "<group>"; };
+		AC8C7B46236CAE5600A7594D /* err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = err.h; sourceTree = "<group>"; };
+		AC8C7B47236CAE5600A7594D /* bn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bn.h; sourceTree = "<group>"; };
+		AC8C7B48236CAE5600A7594D /* blowfish.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = blowfish.h; sourceTree = "<group>"; };
+		AC8C7B49236CAE5600A7594D /* cms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cms.h; sourceTree = "<group>"; };
+		AC8C7B4A236CAE5600A7594D /* engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = engine.h; sourceTree = "<group>"; };
+		AC8C7B4B236CAE5600A7594D /* conf_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = conf_api.h; sourceTree = "<group>"; };
+		AC8C7B4C236CAE5600A7594D /* x509.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509.h; sourceTree = "<group>"; };
+		AC8C7B4D236CAE5600A7594D /* asn1_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1_mac.h; sourceTree = "<group>"; };
+		AC8C7B4E236CAE5600A7594D /* objectserr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = objectserr.h; sourceTree = "<group>"; };
+		AC8C7B4F236CAE5600A7594D /* cmserr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmserr.h; sourceTree = "<group>"; };
+		AC8C7B50236CAE5600A7594D /* ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
+		AC8C7B51236CAE5600A7594D /* opensslconf.h.orig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = opensslconf.h.orig; sourceTree = "<group>"; };
+		AC8C7B52236CAE5600A7594D /* sha.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sha.h; sourceTree = "<group>"; };
+		AC8C7B53236CAE5600A7594D /* symhacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = symhacks.h; sourceTree = "<group>"; };
+		AC8C7B54236CAE5600A7594D /* asn1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1.h; sourceTree = "<group>"; };
+		AC8C7B55236CAE5600A7594D /* bioerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bioerr.h; sourceTree = "<group>"; };
+		AC8C7B56236CAE5600A7594D /* opensslconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opensslconf.h; sourceTree = "<group>"; };
+		AC8C7B57236CAE5600A7594D /* bio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bio.h; sourceTree = "<group>"; };
+		AC8C7B58236CAE5600A7594D /* rc2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rc2.h; sourceTree = "<group>"; };
+		AC8C7B59236CAE5600A7594D /* dh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dh.h; sourceTree = "<group>"; };
+		AC8C7B5A236CAE5600A7594D /* x509v3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509v3.h; sourceTree = "<group>"; };
+		AC8C7B5B236CAE5600A7594D /* conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = conf.h; sourceTree = "<group>"; };
+		AC8C7B5C236CAE5600A7594D /* rand_drbg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rand_drbg.h; sourceTree = "<group>"; };
+		AC8C7B5D236CAE5600A7594D /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md5.h; sourceTree = "<group>"; };
+		AC8C7B5E236CAE5600A7594D /* pemerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pemerr.h; sourceTree = "<group>"; };
+		AC8C7B5F236CAE5600A7594D /* asn1_locl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1_locl.h; sourceTree = "<group>"; };
+		AC8C7B60236CAE5600A7594D /* x509_vfy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509_vfy.h; sourceTree = "<group>"; };
+		AC8C7B61236CAE5600A7594D /* txt_db.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = txt_db.h; sourceTree = "<group>"; };
+		AC8C7B62236CAE5600A7594D /* comperr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = comperr.h; sourceTree = "<group>"; };
+		AC8C7B63236CAE5600A7594D /* cterr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cterr.h; sourceTree = "<group>"; };
+		AC8C7B64236CAE5600A7594D /* safestack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = safestack.h; sourceTree = "<group>"; };
+		AC8C7B65236CAE5600A7594D /* ecdsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ecdsa.h; sourceTree = "<group>"; };
+		AC8C7B66236CAE5600A7594D /* sslerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sslerr.h; sourceTree = "<group>"; };
+		AC8C7B67236CAE5600A7594D /* rc5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rc5.h; sourceTree = "<group>"; };
+		AC8C7B68236CAE5600A7594D /* uierr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uierr.h; sourceTree = "<group>"; };
+		AC8C7B69236CAE5600A7594D /* x509v3err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509v3err.h; sourceTree = "<group>"; };
+		AC8C7B6A236CAE5600A7594D /* objects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = objects.h; sourceTree = "<group>"; };
+		AC8C7B6B236CAE5600A7594D /* pkcs12.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pkcs12.h; sourceTree = "<group>"; };
+		AC8C7B6C236CAE5600A7594D /* crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypto.h; sourceTree = "<group>"; };
+		AC8C7B6D236CAE5600A7594D /* opensslv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opensslv.h; sourceTree = "<group>"; };
+		AC8C7B6E236CAE5600A7594D /* evperr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = evperr.h; sourceTree = "<group>"; };
+		AC8C7B6F236CAE5600A7594D /* pkcs7.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pkcs7.h; sourceTree = "<group>"; };
+		AC8C7B70236CAE5600A7594D /* obj_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = obj_mac.h; sourceTree = "<group>"; };
+		AC8C7B71236CAE5600A7594D /* ct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ct.h; sourceTree = "<group>"; };
+		AC8C7B72236CAE5600A7594D /* async.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = async.h; sourceTree = "<group>"; };
+		AC8C7B73236CAE5600A7594D /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buffer.h; sourceTree = "<group>"; };
+		AC8C7B74236CAE5600A7594D /* ssl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssl.h; sourceTree = "<group>"; };
+		AC8C7B75236CAE5600A7594D /* srp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = srp.h; sourceTree = "<group>"; };
+		AC8C7B76236CAE5600A7594D /* camellia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camellia.h; sourceTree = "<group>"; };
+		AC8C7B77236CAE5600A7594D /* dherr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dherr.h; sourceTree = "<group>"; };
+		AC8C7B78236CAE5600A7594D /* evp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = evp.h; sourceTree = "<group>"; };
+		AC8C7B79236CAE5600A7594D /* e_os2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = e_os2.h; sourceTree = "<group>"; };
+		AC8C7B7A236CAE5600A7594D /* md4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md4.h; sourceTree = "<group>"; };
+		AC8C7B7B236CAE5600A7594D /* hmac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hmac.h; sourceTree = "<group>"; };
+		AC8C7B7C236CAE5600A7594D /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
+		AC8C7B7D236CAE5600A7594D /* engineerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = engineerr.h; sourceTree = "<group>"; };
+		AC8C7B7E236CAE5600A7594D /* comp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = comp.h; sourceTree = "<group>"; };
+		AC8C7B7F236CAE5600A7594D /* pkcs12err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pkcs12err.h; sourceTree = "<group>"; };
+		AC8C7B80236CAE5600A7594D /* cast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cast.h; sourceTree = "<group>"; };
+		AC8C7B81236CAE5600A7594D /* rc4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rc4.h; sourceTree = "<group>"; };
+		AC8C7B82236CAE5600A7594D /* stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
+		AC8C7B83236CAE5600A7594D /* des.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = des.h; sourceTree = "<group>"; };
+		AC8C7B84236CAE5600A7594D /* ocsp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ocsp.h; sourceTree = "<group>"; };
+		AC8C7B85236CAE5600A7594D /* ec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ec.h; sourceTree = "<group>"; };
+		AC8C7B86236CAE5600A7594D /* ecdh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ecdh.h; sourceTree = "<group>"; };
+		AC8C7B87236CAE5600A7594D /* rand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rand.h; sourceTree = "<group>"; };
+		AC8C7B88236CAE5600A7594D /* ecerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ecerr.h; sourceTree = "<group>"; };
+		AC8C7B89236CAE5600A7594D /* ts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ts.h; sourceTree = "<group>"; };
+		AC8C7B8A236CAE5600A7594D /* cryptoerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cryptoerr.h; sourceTree = "<group>"; };
+		AC8C7B8B236CAE5600A7594D /* storeerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = storeerr.h; sourceTree = "<group>"; };
+		AC8C7B8C236CAE5600A7594D /* buffererr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buffererr.h; sourceTree = "<group>"; };
+		AC8C7B8D236CAE5600A7594D /* seed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = seed.h; sourceTree = "<group>"; };
+		AC8C7B8E236CAE5600A7594D /* modes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = modes.h; sourceTree = "<group>"; };
+		AC8C7B8F236CAE5600A7594D /* ssl2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssl2.h; sourceTree = "<group>"; };
+		AC8C7B90236CAE5600A7594D /* tserr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tserr.h; sourceTree = "<group>"; };
+		AC8C7B91236CAE5600A7594D /* rsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rsa.h; sourceTree = "<group>"; };
+		AC8C7B92236CAE5600A7594D /* ripemd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ripemd.h; sourceTree = "<group>"; };
+		AC8C7B93236CAE5600A7594D /* whrlpool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = whrlpool.h; sourceTree = "<group>"; };
+		AC8C7B94236CAE5600A7594D /* tls1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tls1.h; sourceTree = "<group>"; };
+		AC8C7B95236CAE5600A7594D /* rsaerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rsaerr.h; sourceTree = "<group>"; };
+		AC8C7B96236CAE5600A7594D /* randerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = randerr.h; sourceTree = "<group>"; };
+		AC8C7B97236CAE5600A7594D /* mdc2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mdc2.h; sourceTree = "<group>"; };
+		AC8C7B98236CAE5600A7594D /* ocsperr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ocsperr.h; sourceTree = "<group>"; };
+		AC8C7B99236CAE5600A7594D /* x509err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509err.h; sourceTree = "<group>"; };
+		AC8C7B9A236CAE5600A7594D /* pkcs7err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pkcs7err.h; sourceTree = "<group>"; };
+		AC8C7B9B236CAE5600A7594D /* dsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dsa.h; sourceTree = "<group>"; };
+		AC8C7B9C236CAE5600A7594D /* kdferr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kdferr.h; sourceTree = "<group>"; };
+		AC8C7B9D236CAE5600A7594D /* srtp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = srtp.h; sourceTree = "<group>"; };
+		AC8C7B9E236CAE5600A7594D /* asn1t.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1t.h; sourceTree = "<group>"; };
+		AC8C7B9F236CAE5600A7594D /* dsaerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dsaerr.h; sourceTree = "<group>"; };
+		AC8C7BA0236CAE5600A7594D /* bnerr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bnerr.h; sourceTree = "<group>"; };
+		AC8C7BA1236CAE5600A7594D /* conferr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = conferr.h; sourceTree = "<group>"; };
+		AC8C7BA2236CAE5600A7594D /* cmac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmac.h; sourceTree = "<group>"; };
+		AC8C7BA3236CAE5600A7594D /* ebcdic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ebcdic.h; sourceTree = "<group>"; };
+		AC8C7BA4236CAE5600A7594D /* store.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = store.h; sourceTree = "<group>"; };
+		AC8C7BA5236CAE5600A7594D /* idea.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = idea.h; sourceTree = "<group>"; };
+		AC8C7BA6236CAE5600A7594D /* lhash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lhash.h; sourceTree = "<group>"; };
+		AC8C7BA7236CAE5600A7594D /* asn1err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1err.h; sourceTree = "<group>"; };
+		AC8C7BA9236CAE5600A7594D /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
+		AC8C7BAA236CAE5600A7594D /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
+		AC8C7BAC236CAE5600A7594D /* IAPReceipt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAPReceipt.swift; sourceTree = "<group>"; };
+		AC8C7BAD236CAE5600A7594D /* Receipt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Receipt.swift; sourceTree = "<group>"; };
+		AC8C7BAE236CAE5600A7594D /* ASN1Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ASN1Helpers.swift; sourceTree = "<group>"; };
+		AC8C7BB0236CAE5600A7594D /* AppleIncRootCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleIncRootCertificate.cer; sourceTree = "<group>"; };
+		AC91366C22F0AEBC00DE4ABF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		AC91367022F0F46300DE4ABF /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		ACF1F56D245662FF00BBE2F7 /* WizardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WizardViewController.swift; sourceTree = "<group>"; };
+		B1BC6D99C532B146A79E3AE5 /* Pods-TheMellaUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMellaUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-The MellaUITests/Pods-TheMellaUITests.release.xcconfig"; sourceTree = "<group>"; };
+		C380DBCA7980AB1FF4EAA619 /* Pods-TheMellaUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMellaUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-TheMellaUITests/Pods-TheMellaUITests.release.xcconfig"; sourceTree = "<group>"; };
+		C8226DDABF4DFFBE550A5094 /* Pods_TheMellaTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TheMellaTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0B2B7AE429C93F52F17218C /* Pods_The_MellaUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_The_MellaUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D42A16F051108D7965C2044F /* Pods_The_MellaTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_The_MellaTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E55527E1F68A7DFBD506B57C /* Pods-TheMella.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMella.release.xcconfig"; path = "Pods/Target Support Files/Pods-The Mella/Pods-TheMella.release.xcconfig"; sourceTree = "<group>"; };
+		E6D5219313254B404E16747F /* Pods-TheMella.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TheMella.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TheMella/Pods-TheMella.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		38ACD9A920B6916C0038EA58 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				389D2E2F20B6A8B000221C45 /* FirebaseCore.framework in Frameworks */,
+				AC8C7BB2236CAE5600A7594D /* libcrypto.a in Frameworks */,
+				AC8C7BB3236CAE5600A7594D /* libssl.a in Frameworks */,
+				3851E94120BD745100492308 /* libEsptouch_v0.3.5.3 in Frameworks */,
+				0EF98C8654440B88440DD860 /* Pods_The_Mella.framework in Frameworks */,
+				AC8AA4DE24539FB500F1C81A /* CarBode in Frameworks */,
+				AC91367122F0F46300DE4ABF /* StoreKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		20980312084B19BA095045F7 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E6D5219313254B404E16747F /* Pods-TheMella.debug.xcconfig */,
+				3D91A2AE82CD7F1746CE6FAF /* Pods-TheMella.release.xcconfig */,
+				5403CE0C6489D41AC4BD50A8 /* Pods-TheMellaTests.debug.xcconfig */,
+				8F7844242AFC6114737C6097 /* Pods-TheMellaTests.release.xcconfig */,
+				7C1DC5AE75FC558FCDA64F85 /* Pods-TheMellaUITests.debug.xcconfig */,
+				C380DBCA7980AB1FF4EAA619 /* Pods-TheMellaUITests.release.xcconfig */,
+				439AF9E656DA0986B7CEE519 /* Pods-TheMella.debug.xcconfig */,
+				E55527E1F68A7DFBD506B57C /* Pods-TheMella.release.xcconfig */,
+				6A7073FD616848226E6CE4DB /* Pods-TheMellaTests.debug.xcconfig */,
+				001DD50B18E14D5F493F7882 /* Pods-TheMellaTests.release.xcconfig */,
+				05A7E6931DD3AA4A51B4D8A3 /* Pods-TheMellaUITests.debug.xcconfig */,
+				B1BC6D99C532B146A79E3AE5 /* Pods-TheMellaUITests.release.xcconfig */,
+				2F2E141239F186B1677E63F6 /* Pods-The Mella.debug.xcconfig */,
+				0477BABE40336E693BBE0A24 /* Pods-The Mella.release.xcconfig */,
+				2FFB052DBDBABBE1F706A542 /* Pods-The MellaTests.debug.xcconfig */,
+				A5553AE07D26FA46E8205AA0 /* Pods-The MellaTests.release.xcconfig */,
+				1C99E5D5B17563BE22AAA818 /* Pods-The MellaUITests.debug.xcconfig */,
+				09F4641DAF65F8EF66966A63 /* Pods-The MellaUITests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		3851E94520BD758500492308 /* ESPTouch */ = {
+			isa = PBXGroup;
+			children = (
+				38D7C2032157BA5800CFAF07 /* GetWiFi.swift */,
+				3851E94420BD746C00492308 /* ESPTouchDelegate.h */,
+				3851E94220BD746C00492308 /* ESPTouchResult.h */,
+				3851E94320BD746C00492308 /* ESPTouchTask.h */,
+				3851E94020BD745100492308 /* libEsptouch_v0.3.5.3 */,
+			);
+			path = ESPTouch;
+			sourceTree = "<group>";
+		};
+		38ACD9A320B6916C0038EA58 = {
+			isa = PBXGroup;
+			children = (
+				AC8C7BAF236CAE5600A7594D /* Certificates */,
+				AC8C7B3B236CAE5600A7594D /* OpenSSL */,
+				AC8C7BAB236CAE5600A7594D /* Receipt */,
+				387BFC172166213F003C6DD4 /* The Mella.entitlements */,
+				38ACD9AE20B6916D0038EA58 /* TheMella */,
+				38ACD9AD20B6916D0038EA58 /* Products */,
+				20980312084B19BA095045F7 /* Pods */,
+				935A718B8B4894C2E8A9605B /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		38ACD9AD20B6916D0038EA58 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				38ACD9AC20B6916D0038EA58 /* The Mella.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		38ACD9AE20B6916D0038EA58 /* TheMella */ = {
+			isa = PBXGroup;
+			children = (
+				AC24B23422F219E3007956AE /* IAP */,
+				385B7C37219BF74A00FA550E /* edit.png */,
+				385EBDD5216E74C900E09892 /* splash.png */,
+				38C8B91F215D1D8600D17551 /* delete.png */,
+				3851E94520BD758500492308 /* ESPTouch */,
+				38B6024C20BD9E8400B57EB0 /* logout.png */,
+				3840EAED20C14AA600171001 /* done.png */,
+				38B6024A20BD9E8400B57EB0 /* scan_qr_code.png */,
+				38B6024B20BD9E8400B57EB0 /* setup_device.png */,
+				38C81F0720B9E9E90049D19F /* setting_btn.png */,
+				38C81F0520B983410049D19F /* time_btn.png */,
+				38C4DB7C20B8121C0076BAA8 /* off_button.png */,
+				38C4DB7D20B8121D0076BAA8 /* on_button.png */,
+				38C4DB7A20B8120C0076BAA8 /* disable_button.png */,
+				38C4DB7820B811970076BAA8 /* mainpagelogo.PNG */,
+				AC91366C22F0AEBC00DE4ABF /* GoogleService-Info.plist */,
+				38C4DB7620B7FC130076BAA8 /* logo.PNG */,
+				38ACD9AF20B6916D0038EA58 /* AppDelegate.swift */,
+				38ACD9B120B6916D0038EA58 /* FirstViewController.swift */,
+				38ACD9B320B6916D0038EA58 /* Main.storyboard */,
+				38ACD9B620B6916F0038EA58 /* Assets.xcassets */,
+				385E96BD215CAFB100A3BA8C /* appicon.png */,
+				38ACD9B820B6916F0038EA58 /* LaunchScreen.storyboard */,
+				38ACD9BB20B6916F0038EA58 /* Info.plist */,
+				38D8363820B6CFC4008276E3 /* LoginViewController.swift */,
+				38D8363A20B6D489008276E3 /* HomeViewController.swift */,
+				38C81F0920B9F5C20049D19F /* TimerViewController.swift */,
+				38805BBD20BAD1BA00E58355 /* TimerTableCell.swift */,
+				38BA14DE20BD6E4F0016D203 /* SettingViewController.swift */,
+				3851E94620BD764C00492308 /* TheMella-Bridging-Header.h */,
+				38D7C2052157C4B300CFAF07 /* DeviceListViewController.swift */,
+				AC8AA4DA2453968F00F1C81A /* DeviceModel.swift */,
+				38E0EBAD215A18500095DAC3 /* DeviceTableViewCell.swift */,
+				38CFEDEF215E2B510035C6DF /* CheckUpdateViewController.swift */,
+				AC8AA4D824538E9C00F1C81A /* AddDeviceWizard.swift */,
+				ACF1F56D245662FF00BBE2F7 /* WizardViewController.swift */,
+			);
+			path = TheMella;
+			sourceTree = "<group>";
+		};
+		935A718B8B4894C2E8A9605B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AC91367022F0F46300DE4ABF /* StoreKit.framework */,
+				389D2E2E20B6A8B000221C45 /* FirebaseCore.framework */,
+				163D805E327CD3328668FD11 /* Pods_TheMella.framework */,
+				C8226DDABF4DFFBE550A5094 /* Pods_TheMellaTests.framework */,
+				88FC1760654AAD335CD27B95 /* Pods_TheMellaUITests.framework */,
+				3D3015BA990105A55CB68F71 /* Pods_The_Mella.framework */,
+				D42A16F051108D7965C2044F /* Pods_The_MellaTests.framework */,
+				D0B2B7AE429C93F52F17218C /* Pods_The_MellaUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AC24B23422F219E3007956AE /* IAP */ = {
+			isa = PBXGroup;
+			children = (
+				AC24B23922F22A24007956AE /* IAPHelper.swift */,
+			);
+			path = IAP;
+			sourceTree = "<group>";
+		};
+		AC8C7B3B236CAE5600A7594D /* OpenSSL */ = {
+			isa = PBXGroup;
+			children = (
+				AC8C7B3C236CAE5600A7594D /* include */,
+				AC8C7BA8236CAE5600A7594D /* lib */,
+			);
+			path = OpenSSL;
+			sourceTree = "<group>";
+		};
+		AC8C7B3C236CAE5600A7594D /* include */ = {
+			isa = PBXGroup;
+			children = (
+				AC8C7B3D236CAE5600A7594D /* openssl */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		AC8C7B3D236CAE5600A7594D /* openssl */ = {
+			isa = PBXGroup;
+			children = (
+				AC8C7B3E236CAE5600A7594D /* pem2.h */,
+				AC8C7B3F236CAE5600A7594D /* kdf.h */,
+				AC8C7B40236CAE5600A7594D /* pem.h */,
+				AC8C7B41236CAE5600A7594D /* asyncerr.h */,
+				AC8C7B42236CAE5600A7594D /* md2.h */,
+				AC8C7B43236CAE5600A7594D /* ssl3.h */,
+				AC8C7B44236CAE5600A7594D /* ossl_typ.h */,
+				AC8C7B45236CAE5600A7594D /* dtls1.h */,
+				AC8C7B46236CAE5600A7594D /* err.h */,
+				AC8C7B47236CAE5600A7594D /* bn.h */,
+				AC8C7B48236CAE5600A7594D /* blowfish.h */,
+				AC8C7B49236CAE5600A7594D /* cms.h */,
+				AC8C7B4A236CAE5600A7594D /* engine.h */,
+				AC8C7B4B236CAE5600A7594D /* conf_api.h */,
+				AC8C7B4C236CAE5600A7594D /* x509.h */,
+				AC8C7B4D236CAE5600A7594D /* asn1_mac.h */,
+				AC8C7B4E236CAE5600A7594D /* objectserr.h */,
+				AC8C7B4F236CAE5600A7594D /* cmserr.h */,
+				AC8C7B50236CAE5600A7594D /* ui.h */,
+				AC8C7B51236CAE5600A7594D /* opensslconf.h.orig */,
+				AC8C7B52236CAE5600A7594D /* sha.h */,
+				AC8C7B53236CAE5600A7594D /* symhacks.h */,
+				AC8C7B54236CAE5600A7594D /* asn1.h */,
+				AC8C7B55236CAE5600A7594D /* bioerr.h */,
+				AC8C7B56236CAE5600A7594D /* opensslconf.h */,
+				AC8C7B57236CAE5600A7594D /* bio.h */,
+				AC8C7B58236CAE5600A7594D /* rc2.h */,
+				AC8C7B59236CAE5600A7594D /* dh.h */,
+				AC8C7B5A236CAE5600A7594D /* x509v3.h */,
+				AC8C7B5B236CAE5600A7594D /* conf.h */,
+				AC8C7B5C236CAE5600A7594D /* rand_drbg.h */,
+				AC8C7B5D236CAE5600A7594D /* md5.h */,
+				AC8C7B5E236CAE5600A7594D /* pemerr.h */,
+				AC8C7B5F236CAE5600A7594D /* asn1_locl.h */,
+				AC8C7B60236CAE5600A7594D /* x509_vfy.h */,
+				AC8C7B61236CAE5600A7594D /* txt_db.h */,
+				AC8C7B62236CAE5600A7594D /* comperr.h */,
+				AC8C7B63236CAE5600A7594D /* cterr.h */,
+				AC8C7B64236CAE5600A7594D /* safestack.h */,
+				AC8C7B65236CAE5600A7594D /* ecdsa.h */,
+				AC8C7B66236CAE5600A7594D /* sslerr.h */,
+				AC8C7B67236CAE5600A7594D /* rc5.h */,
+				AC8C7B68236CAE5600A7594D /* uierr.h */,
+				AC8C7B69236CAE5600A7594D /* x509v3err.h */,
+				AC8C7B6A236CAE5600A7594D /* objects.h */,
+				AC8C7B6B236CAE5600A7594D /* pkcs12.h */,
+				AC8C7B6C236CAE5600A7594D /* crypto.h */,
+				AC8C7B6D236CAE5600A7594D /* opensslv.h */,
+				AC8C7B6E236CAE5600A7594D /* evperr.h */,
+				AC8C7B6F236CAE5600A7594D /* pkcs7.h */,
+				AC8C7B70236CAE5600A7594D /* obj_mac.h */,
+				AC8C7B71236CAE5600A7594D /* ct.h */,
+				AC8C7B72236CAE5600A7594D /* async.h */,
+				AC8C7B73236CAE5600A7594D /* buffer.h */,
+				AC8C7B74236CAE5600A7594D /* ssl.h */,
+				AC8C7B75236CAE5600A7594D /* srp.h */,
+				AC8C7B76236CAE5600A7594D /* camellia.h */,
+				AC8C7B77236CAE5600A7594D /* dherr.h */,
+				AC8C7B78236CAE5600A7594D /* evp.h */,
+				AC8C7B79236CAE5600A7594D /* e_os2.h */,
+				AC8C7B7A236CAE5600A7594D /* md4.h */,
+				AC8C7B7B236CAE5600A7594D /* hmac.h */,
+				AC8C7B7C236CAE5600A7594D /* aes.h */,
+				AC8C7B7D236CAE5600A7594D /* engineerr.h */,
+				AC8C7B7E236CAE5600A7594D /* comp.h */,
+				AC8C7B7F236CAE5600A7594D /* pkcs12err.h */,
+				AC8C7B80236CAE5600A7594D /* cast.h */,
+				AC8C7B81236CAE5600A7594D /* rc4.h */,
+				AC8C7B82236CAE5600A7594D /* stack.h */,
+				AC8C7B83236CAE5600A7594D /* des.h */,
+				AC8C7B84236CAE5600A7594D /* ocsp.h */,
+				AC8C7B85236CAE5600A7594D /* ec.h */,
+				AC8C7B86236CAE5600A7594D /* ecdh.h */,
+				AC8C7B87236CAE5600A7594D /* rand.h */,
+				AC8C7B88236CAE5600A7594D /* ecerr.h */,
+				AC8C7B89236CAE5600A7594D /* ts.h */,
+				AC8C7B8A236CAE5600A7594D /* cryptoerr.h */,
+				AC8C7B8B236CAE5600A7594D /* storeerr.h */,
+				AC8C7B8C236CAE5600A7594D /* buffererr.h */,
+				AC8C7B8D236CAE5600A7594D /* seed.h */,
+				AC8C7B8E236CAE5600A7594D /* modes.h */,
+				AC8C7B8F236CAE5600A7594D /* ssl2.h */,
+				AC8C7B90236CAE5600A7594D /* tserr.h */,
+				AC8C7B91236CAE5600A7594D /* rsa.h */,
+				AC8C7B92236CAE5600A7594D /* ripemd.h */,
+				AC8C7B93236CAE5600A7594D /* whrlpool.h */,
+				AC8C7B94236CAE5600A7594D /* tls1.h */,
+				AC8C7B95236CAE5600A7594D /* rsaerr.h */,
+				AC8C7B96236CAE5600A7594D /* randerr.h */,
+				AC8C7B97236CAE5600A7594D /* mdc2.h */,
+				AC8C7B98236CAE5600A7594D /* ocsperr.h */,
+				AC8C7B99236CAE5600A7594D /* x509err.h */,
+				AC8C7B9A236CAE5600A7594D /* pkcs7err.h */,
+				AC8C7B9B236CAE5600A7594D /* dsa.h */,
+				AC8C7B9C236CAE5600A7594D /* kdferr.h */,
+				AC8C7B9D236CAE5600A7594D /* srtp.h */,
+				AC8C7B9E236CAE5600A7594D /* asn1t.h */,
+				AC8C7B9F236CAE5600A7594D /* dsaerr.h */,
+				AC8C7BA0236CAE5600A7594D /* bnerr.h */,
+				AC8C7BA1236CAE5600A7594D /* conferr.h */,
+				AC8C7BA2236CAE5600A7594D /* cmac.h */,
+				AC8C7BA3236CAE5600A7594D /* ebcdic.h */,
+				AC8C7BA4236CAE5600A7594D /* store.h */,
+				AC8C7BA5236CAE5600A7594D /* idea.h */,
+				AC8C7BA6236CAE5600A7594D /* lhash.h */,
+				AC8C7BA7236CAE5600A7594D /* asn1err.h */,
+			);
+			path = openssl;
+			sourceTree = "<group>";
+		};
+		AC8C7BA8236CAE5600A7594D /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				AC8C7BA9236CAE5600A7594D /* libcrypto.a */,
+				AC8C7BAA236CAE5600A7594D /* libssl.a */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		AC8C7BAB236CAE5600A7594D /* Receipt */ = {
+			isa = PBXGroup;
+			children = (
+				AC8C7BAC236CAE5600A7594D /* IAPReceipt.swift */,
+				AC8C7BAD236CAE5600A7594D /* Receipt.swift */,
+				AC8C7BAE236CAE5600A7594D /* ASN1Helpers.swift */,
+			);
+			path = Receipt;
+			sourceTree = "<group>";
+		};
+		AC8C7BAF236CAE5600A7594D /* Certificates */ = {
+			isa = PBXGroup;
+			children = (
+				AC8C7BB0236CAE5600A7594D /* AppleIncRootCertificate.cer */,
+			);
+			path = Certificates;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		38ACD9AB20B6916C0038EA58 /* The Mella */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 38ACD9D420B6916F0038EA58 /* Build configuration list for PBXNativeTarget "The Mella" */;
+			buildPhases = (
+				83AF155005BBF9D02BB7BC93 /* [CP] Check Pods Manifest.lock */,
+				38ACD9A820B6916C0038EA58 /* Sources */,
+				38ACD9A920B6916C0038EA58 /* Frameworks */,
+				38ACD9AA20B6916C0038EA58 /* Resources */,
+				D83FD5F6A8AC02DC50F22899 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "The Mella";
+			packageProductDependencies = (
+				AC8AA4DD24539FB500F1C81A /* CarBode */,
+			);
+			productName = TheMella;
+			productReference = 38ACD9AC20B6916D0038EA58 /* The Mella.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		38ACD9A420B6916C0038EA58 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0930;
+				LastUpgradeCheck = 0930;
+				ORGANIZATIONNAME = "The Mella";
+				TargetAttributes = {
+					38ACD9AB20B6916C0038EA58 = {
+						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 1130;
+						SystemCapabilities = {
+							com.apple.AccessWiFi = {
+								enabled = 1;
+							};
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+							com.apple.InterAppAudio = {
+								enabled = 0;
+							};
+							com.apple.WAC = {
+								enabled = 0;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 38ACD9A720B6916C0038EA58 /* Build configuration list for PBXProject "TheMella" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 38ACD9A320B6916C0038EA58;
+			packageReferences = (
+				AC8AA4DC24539FB500F1C81A /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */,
+			);
+			productRefGroup = 38ACD9AD20B6916D0038EA58 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				38ACD9AB20B6916C0038EA58 /* The Mella */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		38ACD9AA20B6916C0038EA58 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3840EAEE20C14AA700171001 /* done.png in Resources */,
+				38B6024E20BD9E8500B57EB0 /* setup_device.png in Resources */,
+				38B6024F20BD9E8500B57EB0 /* logout.png in Resources */,
+				38C81F0620B983420049D19F /* time_btn.png in Resources */,
+				38ACD9BA20B6916F0038EA58 /* LaunchScreen.storyboard in Resources */,
+				38C81F0820B9E9E90049D19F /* setting_btn.png in Resources */,
+				38ACD9B720B6916F0038EA58 /* Assets.xcassets in Resources */,
+				38C4DB7B20B8120C0076BAA8 /* disable_button.png in Resources */,
+				38C4DB7720B7FC130076BAA8 /* logo.PNG in Resources */,
+				38C4DB7920B811970076BAA8 /* mainpagelogo.PNG in Resources */,
+				38C8B920215D1D8700D17551 /* delete.png in Resources */,
+				AC91366D22F0AEBC00DE4ABF /* GoogleService-Info.plist in Resources */,
+				385B7C38219BF74B00FA550E /* edit.png in Resources */,
+				38B6024D20BD9E8500B57EB0 /* scan_qr_code.png in Resources */,
+				38C4DB7E20B8121D0076BAA8 /* off_button.png in Resources */,
+				38C4DB7F20B8121D0076BAA8 /* on_button.png in Resources */,
+				AC8C7BB7236CAE5600A7594D /* AppleIncRootCertificate.cer in Resources */,
+				38ACD9B520B6916D0038EA58 /* Main.storyboard in Resources */,
+				AC8C7BB1236CAE5600A7594D /* opensslconf.h.orig in Resources */,
+				385EBDD6216E74C900E09892 /* splash.png in Resources */,
+				385E96BE215CAFB100A3BA8C /* appicon.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		83AF155005BBF9D02BB7BC93 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-The Mella-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D83FD5F6A8AC02DC50F22899 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-The Mella/Pods-The Mella-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework",
+				"${BUILT_PRODUCTS_DIR}/CocoaMQTT/CocoaMQTT.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyTimer/SwiftyTimer.framework",
+				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CocoaAsyncSocket.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CocoaMQTT.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyTimer.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-The Mella/Pods-The Mella-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		38ACD9A820B6916C0038EA58 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				38C81F0A20B9F5C20049D19F /* TimerViewController.swift in Sources */,
+				38D8363920B6CFC4008276E3 /* LoginViewController.swift in Sources */,
+				AC8C7BB5236CAE5600A7594D /* Receipt.swift in Sources */,
+				AC8C7BB4236CAE5600A7594D /* IAPReceipt.swift in Sources */,
+				38D7C2062157C4B300CFAF07 /* DeviceListViewController.swift in Sources */,
+				38ACD9B220B6916D0038EA58 /* FirstViewController.swift in Sources */,
+				AC24B23A22F22A24007956AE /* IAPHelper.swift in Sources */,
+				38ACD9B020B6916D0038EA58 /* AppDelegate.swift in Sources */,
+				38CFEDF0215E2B510035C6DF /* CheckUpdateViewController.swift in Sources */,
+				ACF1F56E245662FF00BBE2F7 /* WizardViewController.swift in Sources */,
+				38D7C2042157BA5900CFAF07 /* GetWiFi.swift in Sources */,
+				AC8AA4D924538E9C00F1C81A /* AddDeviceWizard.swift in Sources */,
+				38805BBE20BAD1BA00E58355 /* TimerTableCell.swift in Sources */,
+				AC8AA4DB2453968F00F1C81A /* DeviceModel.swift in Sources */,
+				38BA14DF20BD6E4F0016D203 /* SettingViewController.swift in Sources */,
+				38E0EBAE215A18500095DAC3 /* DeviceTableViewCell.swift in Sources */,
+				38D8363B20B6D489008276E3 /* HomeViewController.swift in Sources */,
+				AC8C7BB6236CAE5600A7594D /* ASN1Helpers.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		38ACD9B320B6916D0038EA58 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				38ACD9B420B6916D0038EA58 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		38ACD9B820B6916F0038EA58 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				38ACD9B920B6916F0038EA58 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		38ACD9D220B6916F0038EA58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		38ACD9D320B6916F0038EA58 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		38ACD9D520B6916F0038EA58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2F2E141239F186B1677E63F6 /* Pods-The Mella.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "The Mella.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DUAFCQ3X4V;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_ROOT}/Firebase/CoreOnly/Sources",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"\"${PODS_ROOT}/Headers/Public/Firebase\"",
+					"\"$(PROJECT_DIR)/OpenSSL/include\"",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/TheMella/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/OpenSSL/lib",
+				);
+				MARKETING_VERSION = 1.05;
+				NEW_SETTING = "";
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.themella.themella;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "TheMella/TheMella-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		38ACD9D620B6916F0038EA58 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0477BABE40336E693BBE0A24 /* Pods-The Mella.release.xcconfig */;
+			buildSettings = {
+				"ADDITIONAL_SDKS[arch=*]" = "";
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "The Mella.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DUAFCQ3X4V;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_ROOT}/Firebase/CoreOnly/Sources",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"\"${PODS_ROOT}/Headers/Public/Firebase\"",
+					"\"$(PROJECT_DIR)/OpenSSL/include\"",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/TheMella/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/OpenSSL/lib",
+				);
+				MARKETING_VERSION = 1.05;
+				NEW_SETTING = "";
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.themella.themella;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "TheMella/TheMella-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		38ACD9A720B6916C0038EA58 /* Build configuration list for PBXProject "TheMella" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				38ACD9D220B6916F0038EA58 /* Debug */,
+				38ACD9D320B6916F0038EA58 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		38ACD9D420B6916F0038EA58 /* Build configuration list for PBXNativeTarget "The Mella" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				38ACD9D520B6916F0038EA58 /* Debug */,
+				38ACD9D620B6916F0038EA58 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AC8AA4DC24539FB500F1C81A /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AC8AA4DD24539FB500F1C81A /* CarBode */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AC8AA4DC24539FB500F1C81A /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */;
+			productName = CarBode;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 38ACD9A420B6916C0038EA58 /* Project object */;
+}

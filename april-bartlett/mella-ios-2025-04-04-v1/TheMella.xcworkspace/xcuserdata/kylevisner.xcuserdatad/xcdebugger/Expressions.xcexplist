@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "closure #1 in IAPHelper.getExpirationDateFromResponse(_:transationID:):IAPHelper.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "dict_info[&quot;transation_id&quot;]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "FirstViewController.viewDidAppear(_:):FirstViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in IAPHelper.receiptValidation(transaction:):IAPHelper.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "transaction.original?.transactionIdentifier">
+            </PersistentString>
+            <PersistentString
+               value = "transaction.transactionDate!.description">
+            </PersistentString>
+            <PersistentString
+               value = "rec.subscriptionExpirationDate!.description">
+            </PersistentString>
+            <PersistentString
+               value = "transaction.transactionIdentifier!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "IAPHelper.receiptValidation(transaction:):IAPHelper.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "transaction.transactionIdentifier!">
+            </PersistentString>
+            <PersistentString
+               value = "transaction.transactionDate">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "IAPHelper.paymentQueue(_:updatedTransactions:):IAPHelper.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in IAPHelper.receiptValidation():IAPHelper.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "rec.subscriptionExpirationDate">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

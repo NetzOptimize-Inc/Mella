@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>965140418096-6mlvrfplf5as3lim5efc7c2a5qmpphop.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.965140418096-6mlvrfplf5as3lim5efc7c2a5qmpphop</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCL9W6ZQevWl_cq9B3yM-CovmV2P_KiejM</string>
+	<key>GCM_SENDER_ID</key>
+	<string>965140418096</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.themella.mella</string>
+	<key>PROJECT_ID</key>
+	<string>themella-c4e13</string>
+	<key>STORAGE_BUCKET</key>
+	<string>themella-c4e13.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:965140418096:ios:204a04eab60f72b9</string>
+	<key>DATABASE_URL</key>
+	<string>https://themella-c4e13.firebaseio.com</string>
+</dict>
+</plist>
