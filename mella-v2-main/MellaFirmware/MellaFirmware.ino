@@ -58,11 +58,11 @@ String publish_debug = "003915A1/Debug";
 int check_update = 1;
 bool MQTT_Status = 0;
 
-const char* mqttServer = "167.95.122.183";
+const char* mqttServer = "167.71.112.166"; // Working Credentials
 
-const int mqttPort = 1883;
-const char* mqttUser = "user";
-const char* mqttPassword = "Password$$";
+const int mqttPort = 1883; // Working Credentials
+const char* mqttUser = "themella"; // Working Credentials
+const char* mqttPassword = "!@#mqtt"; // Working Credentials
 
 WiFiUDP Udp;
 unsigned int localPort = 8888; 
