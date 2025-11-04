@@ -1,0 +1,10 @@
+Feature,Found?,Where,Example
+Power‑on behavior / LED rotates,True,Line ~112,#define heatingCycleDuration 30000
+Wi‑Fi config from EEPROM,True,Line ~59,"const char* mqttPassword = ""!@#mqtt"";"
+First‑boot AP / Wi‑Fi provisioning,False,,"const char* mqttPassword = ""!@#mqtt"";"
+MQTT connectivity (PubSubClient),True,Line ~16,PubSubClient client(espClient);
+Knob for temperature setpoint,True,Line ~30,void set_temp(int knob_input);
+Temperature sensing / thermostat,True,Line ~8,#include <DallasTemperature.h>
+Heater control / cutoff,True,Line ~119,"pinMode(RELAY, OUTPUT);"
+Periodic tasks (Ticker),True,Line ~18,Ticker tasker;
+EEPROM write on config,True,Line ~117,EEPROM.begin(512);

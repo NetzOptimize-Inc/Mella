@@ -1345,7 +1345,7 @@ void heatOff(){
   digitalWrite(chrisPin1, HIGH);
   digitalWrite(chrisPin2, HIGH); */
   digitalWrite(RELAY, LOW);    // ON (active-LOW relay)
-    Serial.println("Heater: OFF");
+  Serial.println("Heater: OFF");
 //  if(digitalRead(transistorPin) == HIGH){
 ////    digitalWrite(RELAY, LOW);
 ////    delay(25);
