@@ -445,8 +445,10 @@ void ble_setup() {
     DEBUG_PRINTLN("BLE setup completed successfully!");
 }
 
+
 void setup() {
   Serial.begin(115200);
+  Serial.println("DEBUG: setup done");
   delay(2000); // Give serial time to initialize
   DEBUG_PRINTLN("\n"); // Print a newline for cleaner output
   
@@ -577,6 +579,9 @@ void setHysteresis(float newHysteresis) {
 
 void loop() {
   // Handle new WiFi connection attempt from BLE
+  digitalWrite(LED2, HIGH);
+  digitalWrite(LED_STATUS, HIGH);
+
   if (shouldConnect && gotSSID && gotPASS) {
     DEBUG_PRINTLN("Attempting to connect with new credentials...");
     shouldConnect = false;
@@ -701,7 +706,7 @@ void loop() {
     while (!sensors.isConversionComplete()) n++;
     temp_c = sensors.getTempC(mainThermometer);
   }
-
+  
   delay(500);
 }
 
@@ -1029,7 +1034,55 @@ bool set_temp(int knob_input)
     case 10: targetTemp = 120 + calibration_offset; break;
     default: targetTemp = default_temp; break;
   }
-  
+  // Amod Debug Code Started
+float currentTemp = temp_c;           // DS18B20 reading
+float target = targetTemp;            // set from knob
+float hysteresis = 2.0;               // +/- hysteresis in degrees (adjust as needed)
+
+// Compute simple hysteresis thresholds
+float lowerThreshold = target - (hysteresis / 2.0);
+float upperThreshold = target + (hysteresis / 2.0);
+
+// DEBUG print for thresholds
+Serial.print("DBG_THRESH lower=");
+Serial.print(lowerThreshold);
+Serial.print(" upper=");
+Serial.println(upperThreshold);
+
+// Determine shouldHeat based purely on instantaneous reading (not toggled state)
+bool newShouldHeat = false;
+if (currentTemp < lowerThreshold) {
+  newShouldHeat = true;
+} else if (currentTemp > upperThreshold) {
+  newShouldHeat = false;
+} else {
+  // If within hysteresis band, keep previous heatingState to avoid rapid toggle
+  newShouldHeat = heatingState ? true : false;
+}
+
+// Update shouldHeat variable used elsewhere
+shouldHeat = newShouldHeat;
+
+// Now set heatingState (you can keep or remove extra state variable)
+heatingState = shouldHeat;
+
+// Drive the transistor/relay pin according to heatingState
+pinMode(transistorPin, OUTPUT); // ensure output mode set
+// NOTE: If your relay is ACTIVE-LOW, swap HIGH/LOW below
+digitalWrite(transistorPin, heatingState ? HIGH : LOW);
+
+// EXTRA DEBUG
+Serial.print("DBG_DECISION temp=");
+Serial.print(currentTemp);
+Serial.print(" target=");
+Serial.print(target);
+Serial.print(" shouldHeat=");
+Serial.print(shouldHeat ? 1 : 0);
+Serial.print(" heatingState=");
+Serial.print(heatingState ? 1 : 0);
+Serial.print(" transistorPin_read=");
+Serial.println(digitalRead(transistorPin));
+  // Amod Debug Code Ended
   // Implement hysteresis control logic
   if (!heatingState) {
     // Heater is currently OFF
@@ -1038,7 +1091,7 @@ bool set_temp(int knob_input)
       heatingState = true;
       heat();
       #ifdef DEBUG_MODE
-      Serial.print("Heater ON - Temp: ");
+      Serial.print("My Heater ON - Temp: ");
       Serial.print(temp_c);
       Serial.print("°C, Target: ");
       Serial.print(targetTemp);
@@ -1263,7 +1316,7 @@ bool set_temp(int knob_input)
 //       }
 //       break;
 
-//     default:
+//      default:
 //       if (temp_c <= default_temp)
 //       {
 //          heat();
@@ -1287,10 +1340,21 @@ bool set_temp(int knob_input)
 
 
 void heat(){
+  #ifdef DEBUG_MODE
+    DEBUG_PRINT("Value Of shouldHeat: ");
+    DEBUG_PRINTLN(shouldHeat);
+  #endif
+
   if(shouldHeat){
+    #ifdef DEBUG_MODE
+      DEBUG_PRINT("RELAY ON");
+    #endif
     digitalWrite(transistorPin, HIGH);
   }
   else{
+    #ifdef DEBUG_MODE
+      DEBUG_PRINT("RELAY OFF");
+    #endif
     digitalWrite(transistorPin, LOW);
   }
 }
