@@ -106,8 +106,7 @@ void blinkUnknownCmd()
 }
 
 //Serve the configuration webpage for Wi-Fi setup
-String configPage = R"rawliteral
-(
+String configPage = R"rawliteral(
   <!DOCTYPE html>
   <html>
   <head>
@@ -141,7 +140,7 @@ void handleSave() {
     String ssid = server.arg("ssid");
     String pass = server.arg("pass");
     saveCredentialsToEEPROM(ssid.c_str(), pass.c_str());
-    server.send(200, "text/html", "<p>Saved. Rebooting...</p>");
+    server.send(200, "text/html", "<p>Saved. Rebooting</p>");
     delay(1000);
     ESP.restart();
   } 
