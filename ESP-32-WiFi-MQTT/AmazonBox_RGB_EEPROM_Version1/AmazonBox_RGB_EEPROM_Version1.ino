@@ -1,3 +1,9 @@
+// The Project is working
+// Including the Reset Button
+// As soon as Someone Press Reset Button, it Erase the EEPROM data and after try to connect to WiFi, if not connected, it Advertise the APMode and After connecting to APMode
+// and browser connects to 192.168.4.1, After providing the WiFi Credentials, it Connects to the WiFi and executes the program. 
+// The Device creates a new Identification every time, Thus we need to change the MQTT Susbscription name everytime to switch on/Off Blue LED. 
+
 #include <WiFi.h>
 #include <WebServer.h>
 #include <PubSubClient.h>
@@ -6,8 +12,13 @@
 #define EEPROM_SIZE 256
 
 // USER CONFIG
-const char* defaultAP_SSID = "SafetyBox_Config";
-const char* defaultAP_PASS = "safety123";
+String defaultAP_SSID;
+char id[5];
+
+
+// const char* defaultAP_SSID = "AmazonBox-" + String(id);
+// The Output will be like AmazonBox-1A3F OR AmazonBox-00AF OR AmazonBox-FE23
+const char* defaultAP_PASS = "Connect123";
 const char* mqtt_server = "broker.hivemq.com";
 const uint16_t mqtt_port = 1883;
 
@@ -17,13 +28,15 @@ const uint16_t mqtt_port = 1883;
 #define GREEN_LED 16
 #define BLUE_LED 2
 
+// RESET BUTTON
+#define RESET_BUTTON_PIN 32
+
 WebServer server(80);
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
-String deviceUID;
-String cmdTopic = "SafetyBox/cmd";
-String statusTopic = "SafetyBox/status";
+String cmdTopic; 
+String statusTopic; 
 bool lockState = true;
 
 //LED STATUS CONTROL 
@@ -50,6 +63,8 @@ void showConnected() {
   clearAllLEDs();
   digitalWrite(GREEN_LED, HIGH);
   Serial.println("🟢 Connected to Wi-Fi & MQTT");
+  Serial.println(defaultAP_SSID);
+  Serial.println("=============");
 }
 
 void blinkBlueAction() {
@@ -86,13 +101,28 @@ void readCredentialsFromEEPROM(String& outSsid, String& outPass) {
   outPass = String(bufP);
   outSsid.trim();
   outPass.trim();
+  Serial.printf("SSID from EEPROM: %s\n", outSsid.c_str());
+  Serial.printf("PASS from EEPROM: %s\n", outPass.c_str());
+}
+
+// Erase the EEPRom. 
+void factoryReset() {
+  EEPROM.begin(512);
+  for (int i = 0; i < 512; i++) {
+    EEPROM.write(i, 0xFF);  // Default erased value
+  }
+  EEPROM.commit();
+  Serial.println("EEPROM cleared. Restarting...");
+  delay(300);
+  ESP.restart();
 }
 
 //CONFIG PORTAL 
 void startConfigPortal() {
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(defaultAP_SSID, defaultAP_PASS);
+  WiFi.softAP(defaultAP_SSID.c_str(), defaultAP_PASS);
   IPAddress apIP = WiFi.softAPIP();
+  Serial.println("APMode WiFi Name: " + defaultAP_SSID);
   Serial.print("Config AP IP: ");
   Serial.println(apIP);
   showConfigMode();
@@ -103,10 +133,10 @@ void startConfigPortal() {
     "<html>"
     "<head>"
     "<meta charset='utf-8'>"
-    "<title>SafetyBox Wi-Fi Setup</title>"
+    "<title>AmazonBox Wi-Fi Setup</title>"
     "</head>"
     "<body>"
-    "<h2>SafetyBox - Wi-Fi Configuration</h2>"
+    "<h2>AmazonBox - Wi-Fi Configuration</h2>"
     "<p>Enter your Wi-Fi details below:</p>"
     "<form action='/save' method='post'>"
     "SSID:<br>"
@@ -131,6 +161,13 @@ void startConfigPortal() {
     String pass = server.arg("pass");
     saveCredentialsToEEPROM(ssid.c_str(), pass.c_str());
     server.send(200, "text/html", "Saved! Rebooting...");
+    delay(2000);
+    ESP.restart();
+  });
+
+  server.on("/remove", HTTP_POST, []() {
+    factoryReset();
+    server.send(200, "text/html", "Removed! Rebooting...");
     delay(2000);
     ESP.restart();
   });
@@ -192,19 +229,24 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     mqttClient.publish(statusTopic.c_str(), "ERROR: UNKNOWN_CMD");
     Serial.println("⚠️ Unknown command received");
   }
+  showConnected();
 }
 
-//MQTT RECONNECT 
+//MQTT RECONNECT
 void reconnectMQTT() {
+  
   while (!mqttClient.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    String clientId = "SafetyBoxClient-" + String(random(0xffff), HEX);
+    Serial.print("Attempting MQTT connection ... :");
+    String clientId = "AmazonBox-" + String(id);
+    cmdTopic = clientId + "/cmd";
+    statusTopic = clientId + "/status";
+    Serial.print(cmdTopic);
     if (mqttClient.connect(clientId.c_str())) {
-      Serial.println("connected ✅");
+      Serial.println(" : Connected ✅");
       mqttClient.subscribe(cmdTopic.c_str());
       mqttClient.publish(statusTopic.c_str(), "CONNECTED");
       showConnected();
-      Serial.println("📡 Subscribed to topic: SafetyBox/cmd");
+      Serial.println("📡 Subscribed To Topic: AmazonBox/cmd");
     } else {
       Serial.print("❌ Failed, rc=");
       Serial.println(mqttClient.state());
@@ -215,12 +257,20 @@ void reconnectMQTT() {
 }
 
 //SETUP
-void setup() {
+
+void setup() {  
+  sprintf(id, "%04X", random(0xffff));
+  defaultAP_SSID = String("AmazonBox-") + id;
   Serial.begin(115200);
+  Serial.println(defaultAP_SSID);
+  Serial.println("In Setup");
+  
   pinMode(RED_LED, OUTPUT);
   pinMode(YELLOW_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
   pinMode(BLUE_LED, OUTPUT);
+  pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
+  
   clearAllLEDs();
 
   showStartup();
@@ -251,6 +301,15 @@ void loop() {
   if (!mqttClient.connected()) {
     Serial.println("⚠️ MQTT disconnected. Reconnecting...");
     reconnectMQTT();
+  }
+
+  if (digitalRead(RESET_BUTTON_PIN) == LOW) {
+    delay(50);
+    
+    if (digitalRead(RESET_BUTTON_PIN) == HIGH) {
+      Serial.println("⚠️ RESET BUTTON CLICKED...");
+      factoryReset();
+    }
   }
 
   mqttClient.loop();

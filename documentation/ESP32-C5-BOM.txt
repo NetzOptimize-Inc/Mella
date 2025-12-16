@@ -1,0 +1,4 @@
+ESP32-C5
+10K Potentiometer with ON/OFF Switch
+DS18B20
+Relay Modules

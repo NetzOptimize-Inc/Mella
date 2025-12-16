@@ -1,15 +1,16 @@
 #include <WiFi.h>
+#include <WebServer.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <PubSubClient.h>
-#include <FlashMemory.h>
+
 #include <TimeLib.h>
 #include <AnchorOTA.h>
 #include "wifi_conf.h"
 #include "wifi_drv.h"
-#include "BLEDevice.h"
+#include <Preferences.h> // Added New
 #ifdef DEBUG_MODE
   #define DEBUG_PRINT(x)     Serial.print(x)
   #define DEBUG_PRINTLN(x)   Serial.println(x, y)
@@ -29,7 +30,12 @@
 #define SSID_OFFSET        100
 #define PASS_OFFSET        200
 #define VALID_OFFSET       300
-#define FLASH_VALID_FLAG   0x12345678
+
+AmebaWebServer provisioningServer;
+bool provisioningActive = false;
+
+String provSSID = "";
+String provPASS = "";
 
 IPAddress ota_ip;
 #define device_generation 2
@@ -114,133 +120,146 @@ bool status_off = false;
 char SSID[128];
 char Password[128];
 
-/**
- * @brief 
- * @param ssid
- * @param password 
- */
+Preferences prefs;
+
+static const char *PREF_NAMESPACE = "wifi_cfg";
+static const char *KEY_SSID       = "ssid";
+static const char *KEY_PASS       = "pass";
+static const char *KEY_FLAG       = "valid";
+
+static const uint32_t FLASH_VALID_FLAG = 0xA5A5A5A5; // same as your original logic
+
+
+/********************************************************************
+ * SAVE CREDENTIALS (Preferences version, same logic + debug)
+ ********************************************************************/
 void saveCredentialsToFlash(String ssid, String password) {
   DEBUG_PRINTLN("Saving credentials to flash memory...");
-  
-  try {
-    FlashMemory.read();
-    memset(&FlashMemory.buf[SSID_OFFSET], 0, 128);
-    memset(&FlashMemory.buf[PASS_OFFSET], 0, 128);
-    
-    // Save SSID
-    strncpy((char*)&FlashMemory.buf[SSID_OFFSET], ssid.c_str(), 127);
-    FlashMemory.buf[SSID_OFFSET + 127] = '\0'; // Ensure null termination
-    
-    // Save Password
-    strncpy((char*)&FlashMemory.buf[PASS_OFFSET], password.c_str(), 127);
-    FlashMemory.buf[PASS_OFFSET + 127] = '\0'; 
-    
-    // Add validity flag
-    uint32_t validFlag = FLASH_VALID_FLAG;
-    memcpy(&FlashMemory.buf[VALID_OFFSET], &validFlag, 4);
-    
-    // Write data back to flash
-    FlashMemory.update();
 
-    delay(100);
-    FlashMemory.read();
-    uint32_t readFlag = 0;
-    memcpy(&readFlag, &FlashMemory.buf[VALID_OFFSET], 4);
-    
-    if (readFlag == FLASH_VALID_FLAG) {
-      DEBUG_PRINTLN("Credentials saved to flash memory successfully!");
-      Serial.print("Saved SSID: ");
-      DEBUG_PRINTLN(ssid);
-    } else {
-      DEBUG_PRINTLN("ERROR: Failed to verify saved credentials!");
-    }
-    
-  } catch (...) {
-    DEBUG_PRINTLN("ERROR: Exception occurred while saving to flash!");
+  if (!prefs.begin(PREF_NAMESPACE, false)) {
+    DEBUG_PRINTLN("ERROR: Failed to open preferences namespace!");
+    return;
+  }
+
+  // --- Write SSID ---
+  DEBUG_PRINT("Saving SSID: ");
+  DEBUG_PRINTLN(ssid);
+
+  if (!prefs.putString(KEY_SSID, ssid)) {
+    DEBUG_PRINTLN("ERROR: Failed to write SSID into flash!");
+    prefs.end();
+    return;
+  }
+
+  // --- Write Password ---
+  DEBUG_PRINT("Saving Password (length): ");
+  DEBUG_PRINTLN(password.length());
+
+  if (!prefs.putString(KEY_PASS, password)) {
+    DEBUG_PRINTLN("ERROR: Failed to write Password into flash!");
+    prefs.end();
+    return;
+  }
+
+  // --- Write validity flag ---
+  DEBUG_PRINT("Writing validity flag: 0x");
+  DEBUG_PRINTLN(String(FLASH_VALID_FLAG, HEX));
+
+  if (!prefs.putUInt(KEY_FLAG, FLASH_VALID_FLAG)) {
+    DEBUG_PRINTLN("ERROR: Failed to write validity flag!");
+    prefs.end();
+    return;
+  }
+
+  prefs.end();
+  delay(50);
+
+  // ===== VERIFY SAVED DATA (same flow as your original) =====
+  prefs.begin(PREF_NAMESPACE, true);
+  uint32_t readFlag = prefs.getUInt(KEY_FLAG, 0);
+  prefs.end();
+
+  if (readFlag == FLASH_VALID_FLAG) {
+    DEBUG_PRINTLN("Credentials saved to flash memory successfully!");
+    DEBUG_PRINT("Saved SSID: ");
+    DEBUG_PRINTLN(ssid);
+  } else {
+    DEBUG_PRINTLN("ERROR: Failed to verify saved credentials!");
   }
 }
 
-/**
- * @brief Enhanced function to load WiFi credentials from flash memory with validation
- * @param ssid Reference to string to store loaded SSID
- * @param password Reference to string to store loaded password
- * @return true if valid credentials were found, false otherwise
- */
+
+
+/********************************************************************
+ * LOAD CREDENTIALS (Preferences version, same logic + debug)
+ ********************************************************************/
 bool loadCredentialsFromFlash(String &ssid, String &password) {
   DEBUG_PRINTLN("Attempting to load credentials from flash memory...");
-  
-  try {
-    // Read data from flash to buffer
-    FlashMemory.read();
-    
-    // Check validity flag
-    uint32_t validFlag = 0;
-    memcpy(&validFlag, &FlashMemory.buf[VALID_OFFSET], 4);
-    
-    Serial.print("Flash validity flag: 0x");
-    #ifdef DEBUG_MODE
-     Serial.println(validFlag, HEX);
-    #endif
 
-    
-    if (validFlag != FLASH_VALID_FLAG) {
-      DEBUG_PRINTLN("No valid credentials found in flash memory.");
-      return false;
-    }
-    
-    // Extract SSID
-    char ssidBuffer[128] = {0};
-    strncpy(ssidBuffer, (const char*)&FlashMemory.buf[SSID_OFFSET], 127);
-    ssidBuffer[127] = '\0'; 
-    ssid = String(ssidBuffer);
-    
-    // Extract password
-    char passBuffer[128] = {0};
-    strncpy(passBuffer, (const char*)&FlashMemory.buf[PASS_OFFSET], 127);
-    passBuffer[127] = '\0';
-    password = String(passBuffer);
-    
-    // Validate loaded data
-    if (ssid.length() > 0 && ssid.length() < 128) {
-      DEBUG_PRINTLN("Credentials loaded from flash memory successfully!");
-      Serial.print("Loaded SSID: ");
-      DEBUG_PRINTLN(ssid);
-      Serial.print("Password length: ");
-      DEBUG_PRINTLN(password.length());
-      return true;
-    }
-    
-    DEBUG_PRINTLN("Invalid credentials data in flash memory.");
-    return false;
-    
-  } catch (...) {
-    DEBUG_PRINTLN("ERROR: Exception occurred while reading from flash!");
+  if (!prefs.begin(PREF_NAMESPACE, true)) {
+    DEBUG_PRINTLN("ERROR: Failed to open preferences namespace!");
     return false;
   }
+
+  // --- Check validity flag ---
+  uint32_t validFlag = prefs.getUInt(KEY_FLAG, 0);
+
+  Serial.print("Flash validity flag: 0x");
+  #ifdef DEBUG_MODE
+    Serial.println(validFlag, HEX);
+  #else
+    Serial.println(validFlag, HEX);
+  #endif
+
+  if (validFlag != FLASH_VALID_FLAG) {
+    DEBUG_PRINTLN("No valid credentials found in flash memory.");
+    prefs.end();
+    return false;
+  }
+
+  // --- Load SSID ---
+  ssid = prefs.getString(KEY_SSID, "");
+  DEBUG_PRINT("Loaded SSID: ");
+  DEBUG_PRINTLN(ssid);
+
+  // --- Load Password ---
+  password = prefs.getString(KEY_PASS, "");
+  DEBUG_PRINT("Password length: ");
+  DEBUG_PRINTLN(password.length());
+
+  prefs.end();
+
+  // --- Validate contents just like your original logic ---
+  if (ssid.length() > 0 && ssid.length() < 128) {
+    DEBUG_PRINTLN("Credentials loaded from flash memory successfully!");
+    return true;
+  }
+
+  DEBUG_PRINTLN("Invalid credentials data in flash memory.");
+  return false;
 }
 
-/**
- * @brief Enhanced function to clear WiFi credentials from flash memory
- */
+
+
+/********************************************************************
+ * CLEAR CREDENTIALS (Preferences version, same logic + debug)
+ ********************************************************************/
 void clearCredentialsFromFlash() {
   DEBUG_PRINTLN("Clearing credentials from flash memory...");
-  
-  try {
-    // Read current content
-    FlashMemory.read();
-    
-    // Clear the credential areas
-    memset(&FlashMemory.buf[SSID_OFFSET], 0xFF, 128);
-    memset(&FlashMemory.buf[PASS_OFFSET], 0xFF, 128);
-    memset(&FlashMemory.buf[VALID_OFFSET], 0xFF, 4);
-    
-    // Write back to flash
-    FlashMemory.update();
-    DEBUG_PRINTLN("Credentials cleared from flash memory.");
-    
-  } catch (...) {
-    DEBUG_PRINTLN("ERROR: Exception occurred while clearing flash!");
+
+  if (!prefs.begin(PREF_NAMESPACE, false)) {
+    DEBUG_PRINTLN("ERROR: Failed to open preferences namespace!");
+    return;
   }
+
+  // Remove keys (equivalent to writing 0xFF in your original logic)
+  prefs.remove(KEY_SSID);
+  prefs.remove(KEY_PASS);
+  prefs.remove(KEY_FLAG);
+
+  prefs.end();
+
+  DEBUG_PRINTLN("Credentials cleared from flash memory.");
 }
 
 /**
@@ -347,105 +366,6 @@ void readCB (BLECharacteristic* chr, uint8_t connID) {
     DEBUG_PRINTLN(connID);
 }
 
-void writeCB (BLECharacteristic* chr, uint8_t connID) {
-    (void) connID;
-    Serial.print("Characteristic ");
-    Serial.print(" write by connection ");
-    DEBUG_PRINTLN(connID);
-    if (chr->getDataLen() > 0) {
-        String receivedData = chr->readString();
-        Serial.print("Received string: ");
-        DEBUG_PRINTLN(receivedData);
-        int ssidIndex = receivedData.indexOf("SSID:");
-        int passIndex = receivedData.indexOf(",PASS:");
-
-        if (ssidIndex != -1 && passIndex != -1 && passIndex > ssidIndex) {
-            String ssid = receivedData.substring(ssidIndex + 5, passIndex);
-            String password = receivedData.substring(passIndex + 6);
-            ssid.trim();
-            password.trim();
-            if (ssid.length() > 0 && ssid.length() < 128 && password.length() < 128) {
-                receivedSSID = ssid;
-                receivedPASS = password;
-                gotSSID = true;
-                gotPASS = true;
-                shouldConnect = true;
-                
-                Serial.print("Received SSID: '");
-                Serial.print(receivedSSID);
-                DEBUG_PRINTLN("'");
-                DEBUG_PRINTLN("Received Password: [HIDDEN]");
-                strncpy(SSID, ssid.c_str(), sizeof(SSID) - 1);
-                SSID[sizeof(SSID) - 1] = '\0';
-                strncpy(Password, password.c_str(), sizeof(Password) - 1);
-                Password[sizeof(Password) - 1] = '\0';
-                
-                wifiDisconnectNeeded = true;
-            } else {
-                DEBUG_PRINTLN("Invalid credentials received - length out of bounds");
-            }
-        } else {
-            DEBUG_PRINTLN("Invalid credential format received");
-        }
-    }
-}
-
-void notifCB(BLECharacteristic* chr, uint8_t connID, uint16_t cccd) {
-    (void) connID;
-    if (cccd & GATT_CLIENT_CHAR_CONFIG_NOTIFY) {
-        Serial.print("Notifications enabled on Characteristic");
-        notify = true;
-    } else {
-        Serial.print("Notifications disabled on Characteristic");
-        notify = false;
-    }
-    Serial.print(chr->getUUID().str());
-    Serial.print(" for connection");
-    DEBUG_PRINTLN(connID);
-}
-
-void ble_setup() {
-    DEBUG_PRINTLN("Setting up BLE advertisement data...");
-    
-    advdata.addFlags(GAP_ADTYPE_FLAGS_LIMITED | GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED);
-    String bleName = "Mella-" + uniqueID.substring(6);  // e.g., Mella-E7:54
-    advdata.addCompleteName(bleName.c_str());
-    scndata.addCompleteServices(BLEUUID(UART_SERVICE_UUID));
-
-    DEBUG_PRINTLN("Configuring RX characteristics...");
-    Rx.setWriteProperty(true);
-    Rx.setWritePermissions(GATT_PERM_WRITE);
-    Rx.setWriteCallback(writeCB);
-    Rx.setBufferLen(STRING_BUF_SIZE);
-
-    DEBUG_PRINTLN("Configuring TX characteristics...");
-    Tx.setReadProperty(true);
-    Tx.setReadPermissions(GATT_PERM_READ);
-    Tx.setReadCallback(readCB);
-    Tx.setNotifyProperty(true);
-    Tx.setCCCDCallback(notifCB);
-    Tx.setBufferLen(STRING_BUF_SIZE);
-
-    DEBUG_PRINTLN("Adding characteristics to UART service...");
-    UartService.addCharacteristic(Rx);
-    UartService.addCharacteristic(Tx);
-
-    DEBUG_PRINTLN("Initializing BLE...");
-    BLE.init();
-    DEBUG_PRINTLN("Configuring BLE server...");
-    BLE.configServer(1);
-    DEBUG_PRINTLN("Adding UART service...");
-    BLE.addService(UartService);
-    BLE.configAdvert()->setAdvData(advdata);
-    BLE.configAdvert()->setScanRspData(scndata);
-    DEBUG_PRINTLN("Starting BLE peripheral mode...");
-    BLE.beginPeripheral();
-    
-    bleActive = true;
-    DEBUG_PRINTLN("BLE setup completed successfully!");
-}
-
-
 void setup() {
   Serial.begin(115200);
   Serial.println("DEBUG: setup done");
@@ -505,58 +425,31 @@ void setup() {
     SSID[sizeof(SSID) - 1] = '\0';
     strncpy(Password, storedPASS.c_str(), sizeof(Password) - 1);
     Password[sizeof(Password) - 1] = '\0';
-    
+
     if (connectToWiFi(storedSSID, storedPASS)) {
-      DEBUG_PRINTLN("Connected using stored credentials!");
-      receivedSSID = storedSSID;
-      receivedPASS = storedPASS;
-      lastWiFiCheck = millis();
-      hasValidCredentials = true;
+        DEBUG_PRINTLN("Connected using stored credentials!");
+        receivedSSID = storedSSID;
+        receivedPASS = storedPASS;
+        lastWiFiCheck = millis();
+        hasValidCredentials = true;
     } else {
-      DEBUG_PRINTLN("Failed to connect with stored credentials.");
-      DEBUG_PRINTLN("Clearing old credentials...");
-      clearCredentialsFromFlash();
-    }
-  } else {
-    DEBUG_PRINTLN("Checking legacy credential storage...");
-    FlashMemory.read();
-    bool legacySSIDValid = (FlashMemory.buf[100] != 0xFF && FlashMemory.buf[100] != 0x00);
-    bool legacyPassValid = (FlashMemory.buf[200] != 0xFF && FlashMemory.buf[200] != 0x00);
-    
-    if (legacySSIDValid && legacyPassValid) {
-      // Extract legacy credentials safely
-      memset(SSID, 0, sizeof(SSID));
-      memset(Password, 0, sizeof(Password));
-      
-      strncpy(SSID, (const char*)&FlashMemory.buf[100], sizeof(SSID) - 1);
-      strncpy(Password, (const char*)&FlashMemory.buf[200], sizeof(Password) - 1);
-      
-      if (strlen(SSID) > 0 && strlen(SSID) < 64 && strlen(Password) < 64) {
-        Serial.print("Found legacy SSID: ");
-        DEBUG_PRINTLN(SSID);
-        DEBUG_PRINTLN("Found legacy password: [HIDDEN]");
-        
-        String legacySSID = String(SSID);
-        String legacyPass = String(Password);
-        
-        if (connectToWiFi(legacySSID, legacyPass)) {
-          DEBUG_PRINTLN("Connected using legacy credentials!");
-          saveCredentialsToFlash(legacySSID, legacyPass);
-          receivedSSID = legacySSID;
-          receivedPASS = legacyPass;
-          lastWiFiCheck = millis();
-          hasValidCredentials = true;
-        }
-      } else {
-        DEBUG_PRINTLN("Legacy credentials appear corrupted, clearing...");
-        memset(&FlashMemory.buf[100], 0xFF, 128);
-        memset(&FlashMemory.buf[200], 0xFF, 128);
-        FlashMemory.update();
-      }
-    } else {
-      DEBUG_PRINTLN("No valid legacy credentials found.");
+        DEBUG_PRINTLN("Failed to connect with stored credentials.");
+        DEBUG_PRINTLN("Clearing old credentials...");
+        clearCredentialsFromFlash();
     }
   }
+  else
+  {
+      // ===== NO CREDENTIALS FOUND → ENTER PROVISIONING MODE =====
+      DEBUG_PRINTLN("No stored credentials found.");
+      DEBUG_PRINTLN("Starting WiFi provisioning mode...");
+
+      startProvisioningMode();  
+      // <--- you already have this or similar (AP mode / BLE setup / Web portal)
+
+      hasValidCredentials = false;
+  }
+
   if (!hasValidCredentials) {
     DEBUG_PRINTLN("Setting up BLE for WiFi configuration...");
     ble_setup();
@@ -564,6 +457,8 @@ void setup() {
     DEBUG_PRINTLN("WiFi connected, skipping BLE setup.");
   }
 }
+
+
 
 
 // Optional: Add function to adjust hysteresis dynamically
@@ -578,62 +473,81 @@ void setHysteresis(float newHysteresis) {
 }
 
 void loop() {
-  // Handle new WiFi connection attempt from BLE
+  // Visual heartbeat (retain original LED behavior)
   digitalWrite(LED2, HIGH);
   digitalWrite(LED_STATUS, HIGH);
 
+  // Handle provisioning web server if active (AP mode provisioning)
+  if (provisioningActive) {
+    provisioningServer.handleClient();
+  }
+
+  // Handle new WiFi credentials received from provisioning (web portal)
   if (shouldConnect && gotSSID && gotPASS) {
     DEBUG_PRINTLN("Attempting to connect with new credentials...");
     shouldConnect = false;
-    
-    // Give BLE time to finish processing
+
+    // small delay to allow any pending web requests to finish
     delay(1000);
-    
+
     if (connectToWiFi(receivedSSID, receivedPASS)) {
       DEBUG_PRINTLN("WiFi connection successful! Saving credentials...");
-      
-      // Save credentials using enhanced function
+
+      // Save credentials using Preferences-based function
       saveCredentialsToFlash(receivedSSID, receivedPASS);
-      
-      // Stop BLE after successful connection
-      delay(2000);
-      stopBLE();
-      
+
+      // Stop provisioning web server / AP if it was active
+      if (provisioningActive) {
+        provisioningServer.stop();
+        WiFi.softAPdisconnect(true);
+        provisioningActive = false;
+        DEBUG_PRINTLN("Provisioning stopped.");
+      }
+
       DEBUG_PRINTLN("Configuration complete!");
-      wifiFirstConnect = true; 
+      wifiFirstConnect = true;
     } else {
       DEBUG_PRINTLN("WiFi connection failed with new credentials.");
     }
 
+    // clear temporary flags
     gotSSID = false;
     gotPASS = false;
   }
 
+  // Handle manual wifi disconnect request
   if (wifiDisconnectNeeded) {
     WiFi.disconnect();
     DEBUG_PRINTLN("Disconnected from WiFi.");
     wifiDisconnectNeeded = false;
   }
 
+  // If connected to WiFi
   if (WiFi.status() == WL_CONNECTED) {
     if (wifiFirstConnect) {
+      // Do one-time actions after the first successful connection
       timeClient.update();
+
       rtw_wifi_setting_t wifi_setting;
       wifi_get_setting(WLAN0_NAME, &wifi_setting);
+
       wifiFirstConnect = false;
       DEBUG_PRINTLN("Saving SSID");
       DEBUG_PRINTLN(WiFi.SSID());
-      
+
+      // Prefer receivedSSID if it exists (came from provisioning); otherwise use current WiFi info
       if (receivedSSID.length() > 0) {
         saveCredentialsToFlash(receivedSSID, receivedPASS);
       } else {
-        strcpy((char*)&FlashMemory.buf[100], WiFi.SSID());
-        DEBUG_PRINTLN("Saving Password");
-        DEBUG_PRINTLN((const char *)wifi_setting.password);
-        strcpy((char*)&FlashMemory.buf[200], (const char *)wifi_setting.password);
-        FlashMemory.update();
+        // Save the SSID/password obtained from the stack (wifi_setting.password)
+        // Convert C char* to String for saveCredentialsToFlash()
+        String currentSSID = String(WiFi.SSID());
+        String currentPASS = String((const char *)wifi_setting.password);
+        saveCredentialsToFlash(currentSSID, currentPASS);
       }
     }
+
+    // MQTT setup / routine
     if (MQTT_Status == 0) {
       setupMQTT();
       MQTT_Status = 1;
@@ -641,72 +555,80 @@ void loop() {
       routine_task();
     }
 
+    // Maintain MQTT client
     client.loop();
     if (!client.connected()) {
       reconnect();
     }
+
     publishFirmwareVersion();
 
   } else {
+    // Not connected path
     DEBUG_PRINTLN("Not Connected");
     if (millis() - lastWiFiCheck > wifiCheckInterval) {
       lastWiFiCheck = millis();
-      // Only try reconnecting if we have credentials and haven't exceeded retry limit
+      // Try reconnecting only if we have stored SSID/Password and haven't hit retries
       if (strlen(SSID) > 0 && strlen(Password) > 0 && wifiRetryCount < maxRetries) {
         Serial.print("WiFi disconnected. Retry attempt ");
         Serial.print(wifiRetryCount + 1);
         Serial.print(" of ");
         DEBUG_PRINTLN(maxRetries);
-        
+
         String ssidStr = String(SSID);
         String passStr = String(Password);
-        
+
         if (connectToWiFi(ssidStr, passStr)) {
           DEBUG_PRINTLN("Reconnected successfully!");
         } else {
           wifiRetryCount++;
           if (wifiRetryCount >= maxRetries) {
-            DEBUG_PRINTLN("Max retry attempts reached. Starting BLE configuration...");
-            // Clear old credentials and start BLE config
+            DEBUG_PRINTLN("Max retry attempts reached. Starting provisioning (AP mode)...");
+            // Clear old credentials and start provisioning AP
             clearCredentialsFromFlash();
             memset(SSID, 0, sizeof(SSID));
             memset(Password, 0, sizeof(Password));
             receivedSSID = "";
             receivedPASS = "";
-            startBLEConfig();
+            startProvisioningMode();
           }
         }
-      } else if (!bleActive && strlen(SSID) == 0) {
-        DEBUG_PRINTLN("No WiFi connection and no valid credentials. Starting BLE...");
-        startBLEConfig();
+      }
+      // If no credentials at all, start provisioning (AP mode)
+      else if (!provisioningActive && strlen(SSID) == 0) {
+        DEBUG_PRINTLN("No WiFi connection and no valid credentials. Starting provisioning (AP mode)...");
+        startProvisioningMode();
       }
     }
   }
-  
+
+  // Sensor / knob processing (unchanged)
   sensorValue = analogRead(analogInPin) / 32;
   client.publish(publish_debug.c_str(), String("Knob Value" + String(analogRead(analogInPin))).c_str());
   DEBUG_PRINTLN(analogRead(analogInPin));
   mappedOutput = map(sensorValue, 0, 25, 0, 10);
   outputValue = constrain(mappedOutput, 0, 10);
 
-#ifdef DEBUG_MODE
-  Serial.print("Pot value: ");
-  Serial.print(outputValue);
-#endif
-   sensors.requestTemperatures();
-   temp_c = sensors.getTempCByIndex(0);
   #ifdef DEBUG_MODE
-   Serial.print("  Temperature is: ");
-   DEBUG_PRINTLN(temp_c);
+    Serial.print("Pot value: ");
+    Serial.print(outputValue);
   #endif
-  if(set_temp(outputValue)){
+
+  sensors.requestTemperatures();
+  temp_c = sensors.getTempCByIndex(0);
+  #ifdef DEBUG_MODE
+    Serial.print("  Temperature is: ");
+    Serial.println(temp_c);
+  #endif
+
+  if (set_temp(outputValue)) {
     sensors.setResolution(9);
     sensors.requestTemperatures();
     int n = 0;
     while (!sensors.isConversionComplete()) n++;
     temp_c = sensors.getTempC(mainThermometer);
   }
-  
+
   delay(500);
 }
 
@@ -1916,4 +1838,98 @@ void compare_time()
       break;
   }
 }
+
+const char PROVISION_PAGE[] PROGMEM = R"====(
+<!DOCTYPE html>
+<html>
+<head>
+<title>WiFi Setup</title>
+<style>
+body { font-family: Arial; text-align: center; margin-top: 40px; }
+input { padding: 10px; width: 80%; max-width: 300px; margin: 8px; }
+button { padding: 12px 25px; font-size: 16px; }
+</style>
+</head>
+<body>
+<h2>BW16 WiFi Configuration</h2>
+<form action="/save" method="POST">
+<input name="ssid" placeholder="WiFi SSID"><br>
+<input name="pass" placeholder="WiFi Password"><br><br>
+<button type="submit">Save</button>
+</form>
+</body>
+</html>
+)====";
+
+
+void startProvisioningMode() {
+    DEBUG_PRINTLN("=== Starting AP Provisioning Mode ===");
+
+    provisioningActive = true;
+
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP("Device-Setup", "12345678");
+
+    IPAddress ip = WiFi.softAPIP();
+    DEBUG_PRINT("AP IP Address: ");
+    DEBUG_PRINTLN(ip);
+
+    // Register handlers BEFORE begin()
+    provisioningServer.on("/", HTTP_GET, []() {
+        provisioningServer.send(200, "text/html", PROVISION_PAGE);
+    });
+
+    provisioningServer.on("/save", HTTP_POST, []() {
+        String ssid = provisioningServer.arg("ssid");
+        String pass = provisioningServer.arg("pass");
+
+        DEBUG_PRINT("Received SSID: "); DEBUG_PRINTLN(ssid);
+        DEBUG_PRINT("Received PASS: "); DEBUG_PRINTLN(pass);
+
+        saveCredentialsToFlash(ssid, pass);
+
+        provisioningServer.send(200, "text/plain",
+                               "Saved! Device will reboot...");
+
+        delay(2000);
+        NVIC_SystemReset();
+    });
+
+    provisioningServer.begin();
+
+    DEBUG_PRINTLN("Provisioning server started successfully.");
+}
+
+
+
+
+void handleProvisionPortal() {
+    provisioningServer.send(200, "text/html", PROVISION_PAGE);
+}
+
+void handleProvisionSave() {
+    if (!provisioningServer.hasArg("ssid") || !provisioningServer.hasArg("pass")) {
+        provisioningServer.send(400, "text/plain", "Missing SSID or Password");
+        return;
+    }
+
+    String ssid = provisioningServer.arg("ssid");
+    String pass = provisioningServer.arg("pass");
+
+    DEBUG_PRINT("Received SSID: "); DEBUG_PRINTLN(ssid);
+    DEBUG_PRINT("Received PASS: "); DEBUG_PRINTLN(pass);
+
+    saveCredentialsToFlash(ssid, pass);
+
+    provisioningServer.send(200, "text/plain",
+        "Credentials saved! Device will reboot in 3 seconds.");
+
+    delay(3000);
+    ESP.restart();   // on BW16 reset MCU
+}
+
+void handleNotFound() {
+    provisioningServer.send(404, "text/plain", "Not found");
+}
+
 

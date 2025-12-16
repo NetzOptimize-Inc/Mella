@@ -122,7 +122,7 @@ void setup()
   pinMode(chrisPin1, OUTPUT);
   pinMode(chrisPin2, OUTPUT);
 
-//  analogReference(EXTERNAL);
+  // analogReference(EXTERNAL);
   // Define GPIO Pin state here
   //    Setting up auto devID fetch from ChipID
   String chipID = String(ESP.getChipId(), HEX);
