@@ -408,29 +408,74 @@ String _getPostField(const String &body, const char *key) {
 // ------------------ Button & reset handling ------------------
 void checkButton() {
   int raw = digitalRead(RESET_BUTTON_PIN);
+
   if (raw != lastButtonState) {
     lastStableChange = millis();
   }
+
   if ((millis() - lastStableChange) > 50) {
     if (raw != buttonState) {
       buttonState = raw;
-      if (buttonState == LOW) {
+
+      if (buttonState == LOW) {   // pressed
         pressStart = millis();
+#ifdef DEBUG_MODE
         Serial.println("Button pressed");
-      } else {
+#endif
+      } else {                    // released
         unsigned long dur = millis() - pressStart;
+#ifdef DEBUG_MODE
         Serial.printf("Button released after %lu ms\n", dur);
+#endif
         if (dur >= LONG_PRESS_MS) {
+#ifdef DEBUG_MODE
           Serial.println("Long press detected - factory reset");
-          clearWiFiPrefs();
-        } else {
-          Serial.println("Short press - no action defined");
+#endif
+          factoryReset();
         }
       }
     }
   }
+
   lastButtonState = raw;
 }
+
+void factoryReset() {
+#ifdef DEBUG_MODE
+  Serial.println("FACTORY RESET STARTED");
+#endif
+
+  // Stop services
+  client.disconnect();
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+
+  // Clear WiFi credentials
+  prefs.begin("wifi", false);
+  prefs.clear();
+  prefs.end();
+
+  // Optional: clear schedule
+  prefs.begin("schedule", false);
+  prefs.clear();
+  prefs.end();
+
+  // Visual feedback
+  for (int i = 0; i < 5; i++) {
+    digitalWrite(LED_STATUS, HIGH);
+    delay(200);
+    digitalWrite(LED_STATUS, LOW);
+    delay(200);
+  }
+
+#ifdef DEBUG_MODE
+  Serial.println("FACTORY RESET DONE - REBOOTING");
+#endif
+
+  delay(500);
+  ESP.restart();
+}
+
 
 //MQTT CALLBACK
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
