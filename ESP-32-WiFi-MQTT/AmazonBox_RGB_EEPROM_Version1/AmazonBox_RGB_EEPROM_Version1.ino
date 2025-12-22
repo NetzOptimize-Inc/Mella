@@ -29,7 +29,7 @@ const uint16_t mqtt_port = 1883;
 #define BLUE_LED 2
 
 // RESET BUTTON
-#define RESET_BUTTON_PIN 32
+#define RESET_BUTTON_PIN 33
 
 WebServer server(80);
 WiFiClient espClient;

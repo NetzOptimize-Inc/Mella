@@ -28,6 +28,8 @@
 // Code is running properly without any issue.
 // AmazonBox-B77D/cmd 
 // OPEN AND CLOSE
+// PAssword: setup1234
+// NOTE: The Project is working fine. The RESET Button is also working fine. 
 
 #include <WiFi.h>
 #include <WebServer.h>
@@ -37,10 +39,10 @@
 #include <PubSubClient.h>
 
 // ------------------ User-configurable ------------------
-#define RESET_BUTTON_PIN 32      // long-press to factory reset (use suitable pin)
-#define LONG_PRESS_MS 3000       // 3 seconds
+#define RESET_BUTTON_PIN 25      // long-press to factory reset (use suitable pin)
+#define LONG_PRESS_MS 1000       // 1 seconds
 #define AP_PASSWORD "setup1234" // provisioning AP password (or "" for open)
-#define CONNECT_TIMEOUT_MS 30000 // timeout while connecting to saved WiFi
+#define CONNECT_TIMEOUT_MS 10000 // timeout while connecting to saved WiFi
 
 // EEPROM sizes (not used) kept for reference: SSID 64, PASS 128
 
@@ -54,6 +56,7 @@ const char *KEY_APID = "apid";
 WebServer server(80);
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
+void checkButton();
 
 String currentSSID = "";
 String currentPASS = "";
@@ -66,6 +69,16 @@ const uint16_t mqtt_port = 1883;
 #define YELLOW_LED 4
 #define GREEN_LED 16
 #define BLUE_LED 2
+#define DEBUG_MODE;
+
+#ifdef DEBUG_MODE
+  #define DBG(x) Serial.println(x)
+  #define DBG2(a,b) { Serial.print(a); Serial.println(b); }
+#else
+  #define DBG(x)
+  #define DBG2(a,b)
+#endif
+
 
 // For OneWire/DS18B20 example (if your project uses it)
 #define ONE_WIRE_BUS 27
@@ -73,8 +86,6 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 unsigned long pressStart = 0;
-int lastButtonState = HIGH;
-int buttonState = HIGH;
 unsigned long lastStableChange = 0;
 
 String cmdTopic; 
@@ -406,39 +417,14 @@ String _getPostField(const String &body, const char *key) {
 }
 
 // ------------------ Button & reset handling ------------------
-void checkButton() {
-  int raw = digitalRead(RESET_BUTTON_PIN);
-
-  if (raw != lastButtonState) {
-    lastStableChange = millis();
-  }
-
-  if ((millis() - lastStableChange) > 50) {
-    if (raw != buttonState) {
-      buttonState = raw;
-
-      if (buttonState == LOW) {   // pressed
-        pressStart = millis();
 #ifdef DEBUG_MODE
-        Serial.println("Button pressed");
+  #define DBG(x) Serial.println(x)
+  #define DBG2(a,b) { Serial.print(a); Serial.println(b); }
+#else
+  #define DBG(x)
+  #define DBG2(a,b)
 #endif
-      } else {                    // released
-        unsigned long dur = millis() - pressStart;
-#ifdef DEBUG_MODE
-        Serial.printf("Button released after %lu ms\n", dur);
-#endif
-        if (dur >= LONG_PRESS_MS) {
-#ifdef DEBUG_MODE
-          Serial.println("Long press detected - factory reset");
-#endif
-          factoryReset();
-        }
-      }
-    }
-  }
 
-  lastButtonState = raw;
-}
 
 void factoryReset() {
 #ifdef DEBUG_MODE
@@ -446,7 +432,7 @@ void factoryReset() {
 #endif
 
   // Stop services
-  client.disconnect();
+  mqttClient.disconnect();
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
 
@@ -462,9 +448,9 @@ void factoryReset() {
 
   // Visual feedback
   for (int i = 0; i < 5; i++) {
-    digitalWrite(LED_STATUS, HIGH);
+    digitalWrite(RED_LED, HIGH);
     delay(200);
-    digitalWrite(LED_STATUS, LOW);
+    digitalWrite(RED_LED, LOW);
     delay(200);
   }
 
@@ -513,27 +499,23 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 
 //MQTT RECONNECT
 void reconnectMQTT() {
-  
-  while (!mqttClient.connected()) {
-    Serial.print("Attempting MQTT connection ... :");
-    String clientId = makeAPSSID();
-    cmdTopic = clientId + "/cmd";
-    statusTopic = clientId + "/status";
-    Serial.print(cmdTopic);
-    if (mqttClient.connect(clientId.c_str())) {
-      Serial.println(" : Connected ✅");
-      mqttClient.subscribe(cmdTopic.c_str());
-      mqttClient.publish(statusTopic.c_str(), "CONNECTED");
-      showConnected();
-      Serial.println("📡 Subscribed To Topic: AmazonBox/cmd");
-    } else {
-      Serial.print("❌ Failed, rc=");
-      Serial.println(mqttClient.state());
-      Serial.println("Retrying in 5 seconds...");
-      delay(5000);
-    }
+  static unsigned long lastAttempt = 0;
+  if (mqttClient.connected()) return;
+
+  if (millis() - lastAttempt < 5000) return;
+  lastAttempt = millis();
+
+  String clientId = makeAPSSID();
+  cmdTopic = clientId + "/cmd";
+  statusTopic = clientId + "/status";
+
+  if (mqttClient.connect(clientId.c_str())) {
+    mqttClient.subscribe(cmdTopic.c_str());
+    mqttClient.publish(statusTopic.c_str(), "CONNECTED");
+    showConnected();
   }
 }
+
 
 // ------------------ setup & loop ------------------
 void setup() {
@@ -587,7 +569,7 @@ void loop() {
   unsigned long now = millis();
   if (now - lastServicedMs >= 2000) {   // every 2s
     lastServicedMs = now;
-    Serial.println("Loop heartbeat - calling server.handleClient()");
+    //Serial.println("Loop heartbeat - calling server.handleClient()");
   }
   server.handleClient();
   checkButton();
@@ -632,6 +614,68 @@ void loop() {
 
   // add any other periodic tasks here (sensors, LEDs, etc.)
 }
+
+
+void checkButton() {
+  static bool pressed = false;
+  static unsigned long pressStart = 0;
+  static unsigned long releaseStart = 0;
+
+  const unsigned long DEBOUNCE_MS = 50;
+
+  int raw = digitalRead(RESET_BUTTON_PIN);   // <-- READ HERE
+  unsigned long now = millis();
+
+  // ---- PRESS ----
+  if (raw == LOW && !pressed) {
+    pressed = true;
+    pressStart = now;
+    Serial.println("[BTN] PRESS START");
+  }
+
+  // ---- HELD ----
+  if (pressed && raw == LOW) {
+    unsigned long held = now - pressStart;
+
+#ifdef DEBUG_MODE
+  static int lastRaw = HIGH;
+  if (raw != lastRaw) {
+    Serial.print("[RAW PIN CHANGE] ");
+    Serial.print(raw);
+    Serial.print(" at ");
+    Serial.print(millis());
+    Serial.println(" ms");
+
+    lastRaw = raw;
+
+    delay(1000);   // 👈 DEBUG ONLY: slows output so humans can see it
+  }
+#endif
+
+    if (held >= LONG_PRESS_MS) {
+      Serial.println("[BTN] LONG PRESS CONFIRMED → FACTORY RESET");
+      digitalWrite(RED_LED, HIGH);
+      delay(200);
+      factoryReset();   // never returns
+    }
+  }
+
+  // ---- RELEASE (debounced) ----
+  if (pressed && raw == HIGH) {
+    if (releaseStart == 0) {
+      releaseStart = now;
+    } else if (now - releaseStart > DEBOUNCE_MS) {
+      pressed = false;
+      releaseStart = 0;
+      Serial.println("[BTN] RELEASE");
+    }
+  } else {
+    releaseStart = 0;
+  }
+}
+
+
+
 
 /*
   Integration notes:
