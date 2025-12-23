@@ -342,6 +342,7 @@ void setup() {
     deviceState = STATE_AP_MODE;
     WiFi.mode(WIFI_AP_STA);
     startProvisioningAP();
+    setupWebServer();
   }
 }
 
