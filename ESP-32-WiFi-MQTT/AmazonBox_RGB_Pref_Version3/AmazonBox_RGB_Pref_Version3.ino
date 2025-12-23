@@ -2,6 +2,15 @@
    Version-2 Core Logic PRESERVED
    ONLY LED logic refactored using ENUM
    ====================================================== */
+// Code is running properly without any issue.
+// Yellow Light: Not connected OR APMode Publish
+// GREEN Light: Connected, Door Open. As soon as Green Light Gets Off, Means everything is working and Door is closed. 
+
+// AmazonBox-B77D/cmd 
+// OPEN AND CLOSE
+// Password: setup1234
+// NOTE: The Project is working fine. The RESET Button is also working fine. 
+
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
 #include <WiFi.h>
@@ -182,6 +191,7 @@ String makeAPSSID() {
 /* ===================== WIFI / AP (UNCHANGED) ===================== */
 void startProvisioningAP() {
   String ap = makeAPSSID();
+  Serial.print("APName: " + ap);
   WiFi.softAPdisconnect(true);
   delay(200);
   WiFi.softAP(ap.c_str(), AP_PASSWORD);
@@ -335,6 +345,7 @@ void setup() {
 
   if (connectToStoredWiFi(CONNECT_TIMEOUT_MS)) {
     deviceState = STATE_CONNECTED_READY;
+    setupWebServer(); 
     mqttClient.setServer(mqtt_server, mqtt_port);
     mqttClient.setCallback(mqttCallback);
     reconnectMQTT();
@@ -344,6 +355,202 @@ void setup() {
     startProvisioningAP();
     setupWebServer();
   }
+}
+
+// ------------------ HTTP endpoints ------------------
+void handleStatus() {
+  String json = "{";
+  json += "\"deviceId\":\"" + makeAPSSID() + "\",";
+  json += "\"mode\":\"" + String((WiFi.getMode() & WIFI_MODE_AP) ? "AP" : "STA") + "\"";
+  json += "}";
+  server.send(200, "application/json", json);
+}
+
+void handleScan() {
+  int n = WiFi.scanNetworks();
+  String arr = "[";
+  for (int i = 0; i < n; ++i) {
+    if (i) arr += ",";
+    arr += "{\"ssid\":\"" + WiFi.SSID(i) + "\",\"rssi\":\"" + String(WiFi.RSSI(i)) + "\"}";
+  }
+  arr += "]";
+  server.send(200, "application/json", arr);
+}
+
+void handleConfig() {
+  if (server.method() != HTTP_POST) {
+    server.send(405, "application/json", "{\"error\":\"Method Not Allowed\"}");
+    return;
+  }
+  String body = server.arg("plain");
+  Serial.print("Config body: "); Serial.println(body);
+  // very simple parsing (assumes JSON: {"ssid":"...","password":"..."})
+  int si = body.indexOf("\"ssid\"\:\"");
+  int pi = body.indexOf("\"password\"\:\"");
+  if (si == -1 || pi == -1) {
+    server.send(400, "application/json", "{\"error\":\"invalid payload\"}");
+    return;
+  }
+  si += 9; // move past "ssid":"
+  si = body.indexOf('\"', si);
+  // naive: find the next quote after the key---better to use ArduinoJson if available
+  int sstart = body.indexOf(':', si-9);
+  sstart = body.indexOf('"', sstart) + 1;
+  int sendx = body.indexOf('"', sstart);
+  String newSsid = body.substring(sstart, sendx);
+
+  int pstart = body.indexOf('"', pi) + 1;
+  int pendx = body.indexOf('"', pstart);
+  String newPass = body.substring(pstart, pendx);
+
+  Serial.printf("Received SSID: %s PASS: %s\n", newSsid.c_str(), newPass.c_str());
+  saveWiFi(newSsid, newPass);
+  server.send(200, "application/json", "{\"result\":\"ok\"}");
+
+  // give a short time then attempt connecting
+  delay(200);
+  server.sendContent("\n{\"message\":\"Saved. Will attempt connection.\"}\n");
+}
+
+void handleConnectStatus() {
+  if (WiFi.status() == WL_CONNECTED) {
+    String js = "{\"stage\":\"success\",\"ip\":\"" + WiFi.localIP().toString() + "\"}";
+    server.send(200, "application/json", js);
+  } else {
+    String js = "{\"stage\":\"not_connected\"}";
+    server.send(200, "application/json", js);
+  }
+}
+
+void setupWebServer() {
+  static bool webServerStarted = false;
+  if (webServerStarted) return;
+
+  // --------- Root page (same HTML form as before) ----------
+  server.on("/", HTTP_GET, []() {
+    String page =
+      "<!DOCTYPE html>"
+      "<html>"
+      "<head>"
+      "<meta charset='utf-8'>"
+      "<title>AmazonBox Wi-Fi Setup</title>"
+      "</head>"
+      "<body>"
+      "<h2>AmazonBox - Wi-Fi Configuration</h2>"
+      "<p>Enter your Wi-Fi details below:</p>"
+      "<form action='/save' method='post'>"
+      "SSID:<br>"
+      "<input type='text' name='ssid'><br><br>"
+      "Password:<br>"
+      "<input type='password' name='pass'><br><br>"
+      "<input type='submit' value='Save & Reboot'>"
+      "</form>"
+      "<br><br>"
+      "<p>If you want to clear saved credentials, visit "
+      "<form action='/remove' method='post' style='display:inline;'>"
+      "<input type='submit' value='Clear Credentials'>"
+      "</form>"
+      "</p>"
+      "</body>"
+      "</html>";
+
+    server.send(200, "text/html", page);
+  });
+
+
+  // --------- /save handler (accepts form-url-encoded or JSON) ----------
+  server.on("/save", HTTP_POST, []() {
+    String ssid;
+    String pass;
+
+    // If content-type is application/x-www-form-urlencoded (typical form), server.arg() works
+    if (server.hasArg("ssid") || server.hasArg("pass")) {
+      ssid = server.arg("ssid");
+      pass = server.arg("pass");
+    } else {
+      // Otherwise try to parse JSON or plain body
+      String body = server.arg("plain");
+      body.trim();
+
+      // Try naive JSON parse (works for {"ssid":"my","password":"p"})
+      ssid = _getPostField(body, "ssid");
+      if (ssid.length() == 0) ssid = _getPostField(body, "SSID");
+      pass = _getPostField(body, "pass");
+      if (pass.length() == 0) pass = _getPostField(body, "password");
+
+      // As fallback: if body is like "ssid=XXX&pass=YYY" parse manually
+      if (ssid.length() == 0 && body.indexOf('=') >= 0) {
+        // parse urlencoded simple
+        int sPos = body.indexOf("ssid=");
+        if (sPos >= 0) {
+          int sEnd = body.indexOf('&', sPos);
+          if (sEnd < 0) sEnd = body.length();
+          ssid = body.substring(sPos + 5, sEnd);
+        }
+        int pPos = body.indexOf("pass=");
+        if (pPos >= 0) {
+          int pEnd = body.indexOf('&', pPos);
+          if (pEnd < 0) pEnd = body.length();
+          pass = body.substring(pPos + 5, pEnd);
+        }
+      }
+    }
+
+    ssid.trim();
+    pass.trim();
+
+    Serial.printf("Received /save SSID='%s' PASS='%s'\\n", ssid.c_str(), pass.c_str());
+
+    if (ssid.length() == 0) {
+      server.send(400, "text/plain", "Missing SSID");
+      return;
+    }
+
+    // save using Preferences helper (your implementation)
+    saveWiFi(ssid, pass);    // <-- replaces old saveCredentialsToEEPROM
+
+    // Respond then reboot
+    server.send(200, "text/html", "<h3>Saved! Rebooting...</h3>");
+    delay(1000);
+    ESP.restart();
+  });
+
+  // --------- /remove handler (factory reset) ----------
+  server.on("/remove", HTTP_POST, []() {
+    Serial.println("/remove called - performing factory reset");
+    server.send(200, "text/html", "<h3>Removed! Rebooting...</h3>");
+    delay(500);
+    clearWiFiPrefs();   // clears Preferences and restarts
+    // clearWiFiPrefs() should call ESP.restart(); so code won't reach here
+  });
+
+
+  server.onNotFound([](){
+    Serial.print("HTTP NotFound: "); Serial.println(server.uri());
+    server.send(404, "text/plain", "Not Found");
+  });
+
+  server.on("/scan", handleScan);
+  server.on("/config", handleConfig);
+  server.on("/status", handleStatus);
+  server.on("/connect-status", handleConnectStatus);
+
+  server.begin();
+  webServerStarted = true;
+  Serial.println("Web server started (setupWebServer)");
+}
+
+// --------- Helper: read POST body (form or JSON) ----------
+String _getPostField(const String &body, const char *key) {
+  // naive JSON field extractor: looks for "key":"value"
+  String ks = String("\"") + key + String("\":\"");
+  int p = body.indexOf(ks);
+  if (p >= 0) {
+    p += ks.length();
+    int q = body.indexOf('\"', p);
+    if (q > p) return body.substring(p, q);
+  }
+  return String("");
 }
 
 /* ===================== LOOP ===================== */
