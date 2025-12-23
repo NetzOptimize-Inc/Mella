@@ -1,6 +1,7 @@
 /****************************************************
- * MELLA SAFE_DEBUG FIRMWARE (ESP32-WROOM)
- * Drop-in replacement for debugging on USB power
+ * MELLA SAFE_DEBUG v2
+ * Reset Button + Scheduler restored
+ * ESP32-WROOM USB SAFE
  ****************************************************/
 
 #include <Arduino.h>
@@ -8,27 +9,14 @@
 #include <WebServer.h>
 #include <Preferences.h>
 #include <PubSubClient.h>
+#include <TimeLib.h>
 
 /************* SAFE DEBUG CONFIG *************/
-#define SAFE_DEBUG_MODE   1   // <<< CHANGE TO 0 FOR PRODUCTION
-
-#if SAFE_DEBUG_MODE
-  #define USE_DS18B20     0
-  #define USE_ADC_KNOB   0
-  #define USE_RELAY_HW   0
-  #define USE_OTA        0
-  #define LOOP_DELAY_MS  10
-#else
-  #define USE_DS18B20     1
-  #define USE_ADC_KNOB   1
-  #define USE_RELAY_HW   1
-  #define USE_OTA        1
-  #define LOOP_DELAY_MS  1
-#endif
+#define SAFE_DEBUG_MODE   1
+#define LOOP_DELAY_MS     10
 
 /******************** DEBUG ********************/
 #define DEBUG_MODE
-
 #ifdef DEBUG_MODE
   #define DBG(x) Serial.println(x)
   #define DBG2(a,b) { Serial.print(a); Serial.println(b); }
@@ -42,29 +30,30 @@
 #define AP_PASSWORD "setup1234"
 #define CONNECT_TIMEOUT_MS 15000
 
-/******************** HARDWARE (LOGICAL) ********************/
+/******************** LED PINS ********************/
 #define RED_LED     15
 #define YELLOW_LED  4
 #define GREEN_LED   16
 #define BLUE_LED    2
-#define RELAY       5
 
 /******************** MQTT ********************/
 const char* mqtt_server = "broker.hivemq.com";
 const uint16_t mqtt_port = 1883;
 
 /******************** GLOBALS ********************/
+#define PREF_FORCE_AP "force_ap"
+bool systemStable = false;
 Preferences prefs;
 WebServer server(80);
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
 String topic_publish_status;
-String topic_subscribe_action;
 String topic_publish_debug;
 
-bool wifiOnce = false;
-bool Connection_Status = false;
+bool forceAPMode = false;
+/*************** Function Declaration ****************/
+void checkResetButton();
 
 /******************** LED HELPERS ********************/
 void clearAllLEDs() {
@@ -83,16 +72,16 @@ void showStartup() {
 void showConfigMode() {
   clearAllLEDs();
   digitalWrite(YELLOW_LED, HIGH);
-  DBG("🟡 AP Provisioning Mode");
+  DBG("🟡 AP MODE ACTIVE");
 }
 
 void showConnected() {
   clearAllLEDs();
   digitalWrite(GREEN_LED, HIGH);
-  DBG("🟢 WiFi + MQTT Connected");
+  DBG("🟢 WiFi Connected");
 }
 
-/******************** PREFERENCES ********************/
+/******************** PERSISTENT ID ********************/
 String getPersistentAPId() {
   prefs.begin("wifi", true);
   String id = prefs.getString("apid", "");
@@ -146,22 +135,18 @@ void startProvisioningAP() {
 
 /******************** WEB ********************/
 void setupWebServer() {
-
   server.on("/", HTTP_GET, []() {
-    server.send(200, "text/plain", "MELLA SAFE_DEBUG AP");
+    server.send(200, "text/plain", "MELLA SAFE_DEBUG v2");
   });
 
   server.on("/save", HTTP_POST, []() {
-    String ssid = server.arg("ssid");
-    String pass = server.arg("pass");
-
     prefs.begin("wifi", false);
-    prefs.putString("ssid", ssid);
-    prefs.putString("pass", pass);
+    prefs.putString("ssid", server.arg("ssid"));
+    prefs.putString("pass", server.arg("pass"));
     prefs.end();
 
     server.send(200, "text/plain", "Saved. Rebooting...");
-    delay(1000);
+    delay(800);
     ESP.restart();
   });
 
@@ -170,25 +155,94 @@ void setupWebServer() {
 }
 
 /******************** MQTT ********************/
-void mqttCallback(char* topic, byte* payload, unsigned int len) {
-  DBG2("MQTT topic: ", topic);
-}
-
 void reconnectMQTT() {
   if (mqttClient.connected()) return;
 
   String base = makeAPSSID();
   topic_publish_status = base + "/Status";
-  topic_subscribe_action = base + "/Action";
-  topic_publish_debug = base + "/Debug";
+  topic_publish_debug  = base + "/Debug";
 
   if (mqttClient.connect(base.c_str())) {
-    mqttClient.subscribe(topic_subscribe_action.c_str());
     mqttClient.publish(topic_publish_status.c_str(), "CONNECTED");
     showConnected();
   }
 }
 
+/******************** RESET BUTTON ********************/
+void checkResetButton() {
+  static bool pressed = false;
+  static unsigned long pressStart = 0;
+  static unsigned long lastChange = 0;
+
+  const unsigned long DEBOUNCE_MS = 50;
+
+  int raw = digitalRead(RESET_BUTTON_PIN);
+  unsigned long nowMs = millis();
+
+  // ----- DEBOUNCE EDGE -----
+  if (raw == LOW && !pressed) {
+    if (nowMs - lastChange > DEBOUNCE_MS) {
+      pressed = true;
+      pressStart = nowMs;
+      Serial.println("BTN PRESS CONFIRMED");
+    }
+    lastChange = nowMs;
+  }
+
+  // ----- RELEASE -----
+  if (raw == HIGH && pressed) {
+    if (nowMs - lastChange > DEBOUNCE_MS) {
+      unsigned long held = nowMs - pressStart;
+      pressed = false;
+
+      Serial.print("BTN RELEASE, held = ");
+      Serial.println(held);
+
+      if (held >= 5000) {
+        Serial.println("FACTORY RESET");
+
+        prefs.begin("wifi", false);
+        prefs.clear();
+        prefs.end();
+
+        delay(300);
+        ESP.restart();
+      }
+      else if (held >= 1000) {
+        Serial.println("FORCE AP NEXT BOOT");
+
+        prefs.begin("wifi", false);
+        prefs.putBool(PREF_FORCE_AP, true);
+        prefs.end();
+
+        delay(300);
+        ESP.restart();
+      }
+    }
+    lastChange = nowMs;
+  }
+}
+
+
+
+
+
+/******************** SCHEDULER (SAFE) ********************/
+void schedulerTask() {
+  static time_t lastMinute = 0;
+  time_t currentTime  = now();
+
+  if (minute(currentTime ) != minute(lastMinute)) {
+    lastMinute = currentTime ;
+    DBG2("⏱ Scheduler Tick Minute: ", minute(currentTime ));
+
+    if (mqttClient.connected()) {
+      mqttClient.publish(topic_publish_debug.c_str(), "SCHED_TICK");
+    }
+  }
+}
+
+/******************** SETUP ********************/
 /******************** SETUP ********************/
 void setup() {
 
@@ -196,10 +250,12 @@ void setup() {
   delay(300);
 
   DBG("=================================");
-  DBG("SAFE_DEBUG MODE ENABLED");
+  DBG("SAFE_DEBUG v2 STARTED");
+  DBG2("Reset reason: ", esp_reset_reason());
   DBG("=================================");
-  DBG2("Reset Reason: ", esp_reset_reason());
 
+  /* ---------- PIN MODES ---------- */
+  pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
   pinMode(RED_LED, OUTPUT);
   pinMode(YELLOW_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
@@ -208,41 +264,54 @@ void setup() {
   clearAllLEDs();
   showStartup();
 
-  if (connectToStoredWiFi(CONNECT_TIMEOUT_MS)) {
+  /* ---------- READ FORCE AP FLAG (BEFORE WIFI LOGIC) ---------- */
+  prefs.begin("wifi", false);
+  forceAPMode = prefs.getBool(PREF_FORCE_AP, false);
+  prefs.putBool(PREF_FORCE_AP, false);   // clear after use
+  prefs.end();
+
+  DBG2("Force AP flag: ", forceAPMode);
+
+  /* ---------- WIFI / AP DECISION ---------- */
+  if (!forceAPMode && connectToStoredWiFi(CONNECT_TIMEOUT_MS)) {
+
+    DBG("WiFi connected in STA mode");
     setupWebServer();
+
   } else {
+
+    DBG("Starting AP provisioning mode");
     showConfigMode();
     startProvisioningAP();
     setupWebServer();
   }
 
+  /* ---------- MQTT ---------- */
   if (WiFi.status() == WL_CONNECTED) {
     mqttClient.setServer(mqtt_server, mqtt_port);
-    mqttClient.setCallback(mqttCallback);
     reconnectMQTT();
   }
+
+  /* ---------- SCHEDULER INIT ---------- */
+  setTime(12, 0, 0, 1, 1, 2025);   // dummy time for SAFE_DEBUG scheduler
+
+  /* ---------- FINAL MARKERS ---------- */
+  Serial.printf("Free heap after setup: %d\n", ESP.getFreeHeap());
+  Serial.println("Setup complete. System stable.");
+
+  systemStable = true;
 }
+
 
 /******************** LOOP ********************/
 void loop() {
 
-  static unsigned long lastWifiMs = 0;
-  unsigned long now = millis();
-
   server.handleClient();
   mqttClient.loop();
-
-  if (now - lastWifiMs > 5000) {
-    lastWifiMs = now;
-
-    if (WiFi.status() == WL_CONNECTED) {
-      wifiOnce = true;
-      Connection_Status = true;
-    } else {
-      Connection_Status = false;
-      DBG("WiFi not connected");
-    }
+  if (systemStable) {
+    checkResetButton();
   }
+  schedulerTask();
 
-  delay(LOOP_DELAY_MS);   // ⭐ CRITICAL ⭐
+  delay(LOOP_DELAY_MS);
 }
