@@ -5,6 +5,9 @@
 // Code is running properly without any issue.
 // Yellow Light: Not connected OR APMode Publish
 // GREEN Light: Connected, Door Open. As soon as Green Light Gets Off, Means everything is working and Door is closed. 
+// No BLUE LIGHT LED
+// NOTE : The code started working after adding 10KOmps of Register. 3V to GPIO25. Please note that GPIO25 is also connected to Push Button 
+// Push Button Wiring: One Pin to GND and another PIN to GPIO25. 
 
 // AmazonBox-B77D/cmd 
 // OPEN AND CLOSE
