@@ -1,11 +1,11 @@
-/* ================= AmazonBox Version 3 =================
-   Version-2 Core Logic PRESERVED
+/* ================= AmazonBox Version 4 =================
+   Version-3 Core Logic PRESERVED
    ONLY LED logic refactored using ENUM
    ====================================================== */
 // Code is running properly without any issue.
 // Yellow Light: Not connected OR APMode Publish
 // GREEN Light: Connected, Door Open. As soon as Green Light Gets Off, Means everything is working and Door is closed. 
-// No BLUE LIGHT LED
+// BLUE LIGHT LED for OPEN/CLOSE MQTT Status. 
 // NOTE : The code started working after adding 10KOmps of Register. 3V to GPIO25. Please note that GPIO25 is also connected to Push Button 
 // Push Button Wiring: One Pin to GND and another PIN to GPIO25. 
 
@@ -19,8 +19,6 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <Preferences.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
 #include <PubSubClient.h>
 
 /* ===================== DEBUG ===================== */
@@ -44,7 +42,7 @@
 #define RED_LED     15
 #define YELLOW_LED  4
 #define GREEN_LED   16
-// BLUE LED REMOVED (Version-3)
+#define BLUE_LED 2 // Used for showing the indicator for Amazon Box ON/OFF.
 
 /* ===================== ENUM ===================== */
 enum DeviceState {
@@ -75,17 +73,15 @@ String cmdTopic;
 String statusTopic;
 bool lockState = true;
 
-/* ===================== ONE WIRE (UNCHANGED) ===================== */
-#define ONE_WIRE_BUS 27
-OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature sensors(&oneWire);
-
 /* ===================== TIMERS ===================== */
 unsigned long lastWifiCheckMs = 0;
 unsigned long lastMqttAttemptMs = 0;
 unsigned long yellowBlinkMs = 0;
 unsigned long greenOnMs = 0;
 bool greenLatched = false;
+
+unsigned long blueOnMs = 0;
+bool blueActive = false;
 
 /* ===================== LED STATE MACHINE ===================== */
 void clearAllLEDs() {
@@ -225,20 +221,35 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   msg.trim();
   msg.toUpperCase();
 
+  Serial.println("----- MQTT MESSAGE RECEIVED -----");
+  Serial.print("Topic   : "); Serial.println(topic);
+  Serial.print("Payload : "); Serial.println(msg);
+  Serial.println("----------------------------------");
+
   DBG2("MQTT:", msg);
 
   if (msg == "OPEN" || msg == "UNLOCK") {
+    blueActive = true;
+    blueOnMs = millis();
+    digitalWrite(BLUE_LED, HIGH);
     lockState = false;
     deviceState = STATE_DOOR_OPEN;
     mqttClient.publish(statusTopic.c_str(), "UNLOCKED");
+    Serial.println("Published: UNLOCKED");
   }
   else if (msg == "CLOSE" || msg == "LOCK") {
+    blueActive = true;
+    blueOnMs = millis();
+    digitalWrite(BLUE_LED, HIGH);
     lockState = true;
     deviceState = STATE_DOOR_CLOSED;
     mqttClient.publish(statusTopic.c_str(), "LOCKED");
+    Serial.println("Published: LOCKED");
   }
   else if (msg == "STATUS") {
     mqttClient.publish(statusTopic.c_str(), lockState ? "LOCKED" : "UNLOCKED");
+    Serial.print("Published: ");
+    Serial.println(lockState ? "LOCKED" : "UNLOCKED");
   }
 }
 
@@ -250,10 +261,21 @@ void reconnectMQTT() {
   cmdTopic = clientId + "/cmd";
   statusTopic = clientId + "/status";
 
+  Serial.println("========== MQTT ==========");
+  Serial.print("Client ID   : "); Serial.println(clientId);
+  Serial.print("Subscribing : "); Serial.println(cmdTopic);
+  Serial.print("Publishing  : "); Serial.println(statusTopic);
+
   if (mqttClient.connect(clientId.c_str())) {
     mqttClient.subscribe(cmdTopic.c_str());
     mqttClient.publish(statusTopic.c_str(), "CONNECTED");
+    Serial.println("MQTT connected & subscribed");
+  } else {
+    Serial.print("MQTT connect failed, rc=");
+    Serial.println(mqttClient.state());
   }
+
+  Serial.println("==========================");
 }
 
 /* ===================== BUTTON (UNCHANGED) ===================== */
@@ -333,7 +355,9 @@ void setup() {
   pinMode(RED_LED, OUTPUT);
   pinMode(YELLOW_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
-  
+  pinMode(BLUE_LED, OUTPUT);
+  digitalWrite(BLUE_LED, LOW);
+
   pinMode(RESET_BUTTON_PIN, INPUT);
 
   gpio_set_direction((gpio_num_t)RESET_BUTTON_PIN, GPIO_MODE_INPUT);
@@ -343,7 +367,6 @@ void setup() {
   clearAllLEDs();
   deviceState = STATE_BOOTING;
 
-  sensors.begin();
   randomSeed(esp_random());
 
   if (connectToStoredWiFi(CONNECT_TIMEOUT_MS)) {
@@ -562,6 +585,10 @@ void loop() {
   mqttClient.loop();
   checkButton();
   updateLEDState();
+  if (blueActive && millis() - blueOnMs >= 3000) {
+    digitalWrite(BLUE_LED, LOW);
+    blueActive = false;
+  }
 
   unsigned long now = millis();
 
@@ -582,4 +609,6 @@ void loop() {
     lastMqttAttemptMs = now;
     reconnectMQTT();
   }
+
+  
 }
