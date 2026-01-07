@@ -8,6 +8,10 @@
 // BLUE LIGHT LED for OPEN/CLOSE MQTT Status. 
 // NOTE : The code started working after adding 10KOmps of Register. 3V to GPIO25. Please note that GPIO25 is also connected to Push Button 
 // Push Button Wiring: One Pin to GND and another PIN to GPIO25. 
+// USED MB102 Power Board for providing 5V to the Servo Motor. 
+// YELLOW to GPIO2, RED to 5V Power Board, Brown to GND. 
+// GND is common between the ESP32 and MB102. 
+
 
 // AmazonBox-B77D/cmd 
 // OPEN AND CLOSE
