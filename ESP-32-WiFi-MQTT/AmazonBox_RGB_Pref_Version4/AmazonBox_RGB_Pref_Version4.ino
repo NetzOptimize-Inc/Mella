@@ -20,6 +20,7 @@
 #include <WebServer.h>
 #include <Preferences.h>
 #include <PubSubClient.h>
+#include <ESP32Servo.h>
 
 /* ===================== DEBUG ===================== */
 #define DEBUG 1
@@ -42,7 +43,17 @@
 #define RED_LED     15
 #define YELLOW_LED  4
 #define GREEN_LED   16
-#define BLUE_LED 2 // Used for showing the indicator for Amazon Box ON/OFF.
+
+/* ===================== SERVO PINS ===================== */
+#define SERVO_PIN 2
+#define SERVO_OPEN_ANGLE 0
+#define SERVO_CLOSED_ANGLE 90
+
+#define SERVO_STOP 90
+#define SERVO_CW 180
+#define SERVO_CCW 0
+#define SERVO_MOVE_TIME 400  // adjust for your mechanism
+
 
 /* ===================== ENUM ===================== */
 enum DeviceState {
@@ -66,6 +77,7 @@ PubSubClient mqttClient(espClient);
 String currentSSID = "";
 String currentPASS = "";
 
+Servo lockServo;
 const char* mqtt_server = "broker.hivemq.com";
 const uint16_t mqtt_port = 1883;
 
@@ -80,8 +92,6 @@ unsigned long yellowBlinkMs = 0;
 unsigned long greenOnMs = 0;
 bool greenLatched = false;
 
-unsigned long blueOnMs = 0;
-bool blueActive = false;
 
 /* ===================== LED STATE MACHINE ===================== */
 void clearAllLEDs() {
@@ -229,23 +239,40 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   DBG2("MQTT:", msg);
 
   if (msg == "OPEN" || msg == "UNLOCK") {
-    blueActive = true;
-    blueOnMs = millis();
-    digitalWrite(BLUE_LED, HIGH);
+
+    if (!lockState) {
+      Serial.println("Already OPEN — ignoring command");
+      return;
+    }
+
     lockState = false;
     deviceState = STATE_DOOR_OPEN;
+
+    Serial.println("Executing OPEN...");
+    lockServo.write(SERVO_CCW);
+    delay(SERVO_MOVE_TIME);
+    lockServo.write(SERVO_STOP);
+
     mqttClient.publish(statusTopic.c_str(), "UNLOCKED");
-    Serial.println("Published: UNLOCKED");
   }
   else if (msg == "CLOSE" || msg == "LOCK") {
-    blueActive = true;
-    blueOnMs = millis();
-    digitalWrite(BLUE_LED, HIGH);
+
+    if (lockState) {
+      Serial.println("Already CLOSED — ignoring command");
+      return;
+    }
+
     lockState = true;
     deviceState = STATE_DOOR_CLOSED;
+
+    Serial.println("Executing CLOSE...");
+    lockServo.write(SERVO_CW);
+    delay(SERVO_MOVE_TIME);
+    lockServo.write(SERVO_STOP);
+
     mqttClient.publish(statusTopic.c_str(), "LOCKED");
-    Serial.println("Published: LOCKED");
   }
+
   else if (msg == "STATUS") {
     mqttClient.publish(statusTopic.c_str(), lockState ? "LOCKED" : "UNLOCKED");
     Serial.print("Published: ");
@@ -298,6 +325,7 @@ void factoryReset() {
   }
 
   delay(500);
+  lockServo.detach();
   ESP.restart();
 }
 
@@ -355,14 +383,15 @@ void setup() {
   pinMode(RED_LED, OUTPUT);
   pinMode(YELLOW_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
-  pinMode(BLUE_LED, OUTPUT);
-  digitalWrite(BLUE_LED, LOW);
 
   pinMode(RESET_BUTTON_PIN, INPUT);
 
   gpio_set_direction((gpio_num_t)RESET_BUTTON_PIN, GPIO_MODE_INPUT);
   gpio_pullup_en((gpio_num_t)RESET_BUTTON_PIN);
   gpio_pulldown_dis((gpio_num_t)RESET_BUTTON_PIN);
+
+  lockServo.attach(SERVO_PIN);
+  lockServo.write(SERVO_CLOSED_ANGLE); // Start locked
 
   clearAllLEDs();
   deviceState = STATE_BOOTING;
@@ -585,10 +614,6 @@ void loop() {
   mqttClient.loop();
   checkButton();
   updateLEDState();
-  if (blueActive && millis() - blueOnMs >= 3000) {
-    digitalWrite(BLUE_LED, LOW);
-    blueActive = false;
-  }
 
   unsigned long now = millis();
 
