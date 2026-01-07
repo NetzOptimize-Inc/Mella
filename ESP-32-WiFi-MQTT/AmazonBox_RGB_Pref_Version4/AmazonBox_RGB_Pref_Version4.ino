@@ -77,6 +77,7 @@ Preferences prefs;
 WebServer server(80);
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
+const char *DEVICE_NAMESPACE = "device";
 
 String currentSSID = "";
 String currentPASS = "";
@@ -175,7 +176,7 @@ bool loadWiFi(String &outSSID, String &outPass) {
 }
 
 void clearWiFiPrefs() {
-  prefs.begin(PREF_NAMESPACE, false);
+  prefs.begin(PREF_NAMESPACE, false); // "wifi"
   prefs.clear();
   prefs.end();
   delay(200);
@@ -183,14 +184,16 @@ void clearWiFiPrefs() {
 }
 
 String getPersistentAPId() {
-  prefs.begin(PREF_NAMESPACE, true);
+  prefs.begin(DEVICE_NAMESPACE, true);
   String apid = prefs.getString(KEY_APID, "");
   prefs.end();
+
   if (apid.length() == 0) {
     char id[5];
     sprintf(id, "%04X", (uint16_t)random(0xFFFF));
     apid = String(id);
-    prefs.begin(PREF_NAMESPACE, false);
+
+    prefs.begin(DEVICE_NAMESPACE, false);
     prefs.putString(KEY_APID, apid);
     prefs.end();
   }
