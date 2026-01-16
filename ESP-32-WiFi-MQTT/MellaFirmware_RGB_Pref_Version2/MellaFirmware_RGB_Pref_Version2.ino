@@ -1,3 +1,13 @@
+// The project is working fine, without any error 
+// The New Chip does not have any detail
+// The Device Generates the Device ID, This device ID never erase 
+// The APMode starts, WiFi APMode Populates, The Customer selects the WiFi, name starts with MELLA-XXXX, The PAssword is setup1234
+// After selecting the WiFi, The Webserver starts at 192.168.4.1 (YELLOW LED BLINK)
+// The Browser ask for WiFi Username and Password 
+// The Username/Password goes to Device Memory
+// The Device Connects (GREEN LED for 3 Sec. to show conformation that everything is working)
+// BLUE LED shows that it SwitchedOn the RELAY and Heat is in ON State, below Thrash hold level or Knob Level
+
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
 #include <WiFi.h>
