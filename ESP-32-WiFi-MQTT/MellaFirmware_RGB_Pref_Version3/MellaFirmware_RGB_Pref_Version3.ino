@@ -48,6 +48,21 @@ WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
 bool resetInProgress = false;
+bool systemReady = false;
+/* ===================== SCHEDULER ===================== */
+
+struct DaySchedule {
+  uint8_t startHour;
+  uint8_t startMin;
+  uint8_t endHour;
+  uint8_t endMin;
+  bool enabled;
+};
+
+DaySchedule weekSchedule[7]; 
+// Index: 0=Sunday ... 6=Saturday
+
+bool schedulerEnabled = false;
 
 /* ===================== TIMING ===================== */
 unsigned long lastSensorReadMs = 0;
@@ -78,6 +93,7 @@ void factoryReset() {
   DBG("[RESET] Factory reset initiated");
 
   resetInProgress = true;
+  systemReady = false;
 
   // 1️⃣ Stop heater immediately
   digitalWrite(RELAY_PIN, LOW);
@@ -218,6 +234,70 @@ void set_temp(int knob_input) {
   else heatOff();
 }
 
+/* ===================== SETTING SCHEDULER  ===================== */
+void setDefaultSchedule() {
+  for (int i = 0; i < 7; i++) {
+    weekSchedule[i].startHour = 0;
+    weekSchedule[i].startMin  = 0;
+    weekSchedule[i].endHour   = 0;
+    weekSchedule[i].endMin    = 0;
+    weekSchedule[i].enabled  = false;
+  }
+  schedulerEnabled = false;
+  DBG("[SCHED] Default schedule applied");
+}
+
+/* ===================== Save scheduler to Preferences ===================== */
+void saveScheduleToPrefs() {
+  prefs.begin("schedule", false);
+
+  for (int i = 0; i < 7; i++) {
+    String key = "d" + String(i);
+    prefs.putBytes(key.c_str(), &weekSchedule[i], sizeof(DaySchedule));
+  }
+
+  prefs.putBool("enabled", schedulerEnabled);
+  prefs.end();
+
+  DBG("[SCHED] Schedule saved to Preferences");
+}
+
+/* ===================== Load scheduler from Preferences ===================== */
+bool loadScheduleFromPrefs() {
+  prefs.begin("schedule", true);
+
+  if (!prefs.isKey("enabled")) {
+    prefs.end();
+    return false;
+  }
+
+  schedulerEnabled = prefs.getBool("enabled", false);
+
+  for (int i = 0; i < 7; i++) {
+    String key = "d" + String(i);
+    prefs.getBytes(key.c_str(), &weekSchedule[i], sizeof(DaySchedule));
+  }
+
+  prefs.end();
+
+  DBG("[SCHED] Schedule loaded from Preferences");
+  return true;
+}
+
+/* ============== Force AP mode explicitly ============ */
+void startProvisioningAP() {
+  DBG("[WIFI] Starting AP mode");
+
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+  delay(200);
+
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(("Mella-" + getAPId()).c_str(), AP_PASSWORD);
+
+  systemReady = false;
+}
+
 /* ===================== SETUP ===================== */
 void setup() {
   Serial.begin(115200);
@@ -240,17 +320,33 @@ void setup() {
     DBG("[WIFI] Connecting to saved WiFi");
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid.c_str(), pass.c_str());
+
+    unsigned long start = millis();
+    while (millis() - start < CONNECT_TIMEOUT_MS) {
+      if (WiFi.status() == WL_CONNECTED) {
+        systemReady = true;
+        DBG("[WIFI] Connected");
+        break;
+      }
+      delay(200);
+    }
+
+    if (!systemReady) {
+      DBG("[WIFI] Connection failed");
+      startProvisioningAP();
+    }
   } else {
-    DBG("[WIFI] No credentials → Starting AP mode");
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP(("Mella-" + getAPId()).c_str(), AP_PASSWORD);
+    startProvisioningAP();
   }
 
-
   setupWeb();
-
+  if (!loadScheduleFromPrefs()) {
+    setDefaultSchedule();
+    saveScheduleToPrefs();
+  }
   DBG("System ready");
 }
+
 
 /* ============== Reading Sensor and Appling Heater Logic ============ */
 void updateTemperatureControl() {
@@ -259,16 +355,15 @@ void updateTemperatureControl() {
   lastSensorReadMs = now;
 
   // 🚨 SAFETY GUARD — heater must NEVER run in AP / disconnected state
-  if (resetInProgress ||
-      (WiFi.getMode() & WIFI_MODE_AP) ||
-      WiFi.status() != WL_CONNECTED) {
-
+  // 🚨 ABSOLUTE SAFETY GUARD
+  if (!systemReady) {
     if (digitalRead(RELAY_PIN) == HIGH) {
       heatOff();
-      DBG("[SAFETY] Heater forced OFF (AP / Disconnected / Reset)");
+      DBG("[SAFETY] Heater OFF — system not ready");
     }
     return;
   }
+
 
   // ---- NORMAL OPERATION BELOW ----
 
@@ -291,28 +386,31 @@ void updateTemperatureControl() {
 void updateStatusLED() {
   unsigned long now = millis();
 
+  bool apActive = (WiFi.getMode() == WIFI_MODE_AP);
+
   // AP mode → fast blink
-  if (WiFi.getMode() & WIFI_MODE_AP) {
+  if (apActive) {
     if (now - lastLedUpdateMs >= LED_AP_INTERVAL_MS) {
       lastLedUpdateMs = now;
       yellowLedState = !yellowLedState;
       digitalWrite(YELLOW_LED, yellowLedState);
     }
   }
-  // Disconnected → slow blink
-  else if (WiFi.status() != WL_CONNECTED) {
+  // Not ready (disconnected / retrying) → slow blink
+  else if (!systemReady) {
     if (now - lastLedUpdateMs >= LED_DIS_INTERVAL_MS) {
       lastLedUpdateMs = now;
       yellowLedState = !yellowLedState;
       digitalWrite(YELLOW_LED, yellowLedState);
     }
   }
-  // Connected → LED off
+  // Fully connected → OFF
   else {
     digitalWrite(YELLOW_LED, LOW);
     yellowLedState = false;
   }
 }
+
 
 /* ===================== LOOP ===================== */
 void loop() {
