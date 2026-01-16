@@ -1,4 +1,4 @@
-// The project is working fine, without any error 
+// The project is working fine, without any error (EXCEPT The Mobile Scheduler Part)
 // The New Chip does not have any detail
 // The Device Generates the Device ID, This device ID never erase 
 // The APMode starts, WiFi APMode Populates, The Customer selects the WiFi, name starts with MELLA-XXXX, The PAssword is setup1234
