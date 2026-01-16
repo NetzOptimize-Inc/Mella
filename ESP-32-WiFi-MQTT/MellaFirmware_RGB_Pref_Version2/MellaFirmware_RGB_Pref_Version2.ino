@@ -39,6 +39,17 @@ PubSubClient mqttClient(espClient);
 
 bool resetInProgress = false;
 
+/* ===================== TIMING ===================== */
+unsigned long lastSensorReadMs = 0;
+unsigned long lastLedUpdateMs  = 0;
+
+#define SENSOR_INTERVAL_MS 1000
+#define LED_AP_INTERVAL_MS 250
+#define LED_DIS_INTERVAL_MS 500
+
+bool yellowLedState = false;
+
+
 /* ===================== TEMP ===================== */
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
@@ -231,24 +242,25 @@ void setup() {
   DBG("System ready");
 }
 
-/* ===================== LOOP ===================== */
-void loop() {
-  server.handleClient();
-  checkButton();
+/* ============== Reading Sensor and Appling Heater Logic ============ */
+void updateTemperatureControl() {
+  unsigned long now = millis();
+  if (now - lastSensorReadMs < SENSOR_INTERVAL_MS) return;
+  lastSensorReadMs = now;
 
-  if (resetInProgress) {
-    digitalWrite(RELAY_PIN, LOW);
+  // 🚨 SAFETY GUARD — heater must NEVER run in AP / disconnected state
+  if (resetInProgress ||
+      (WiFi.getMode() & WIFI_MODE_AP) ||
+      WiFi.status() != WL_CONNECTED) {
+
+    if (digitalRead(RELAY_PIN) == HIGH) {
+      heatOff();
+      DBG("[SAFETY] Heater forced OFF (AP / Disconnected / Reset)");
+    }
     return;
   }
 
-  // 🔶 FIX-4: AP / WiFi status LED
-  if (WiFi.getMode() & WIFI_MODE_AP) {
-    digitalWrite(YELLOW_LED, millis() % 500 < 250);  // fast blink in AP mode
-  } else if (WiFi.status() != WL_CONNECTED) {
-    digitalWrite(YELLOW_LED, millis() % 1000 < 500); // slow blink disconnected
-  } else {
-    digitalWrite(YELLOW_LED, LOW); // connected
-  }
+  // ---- NORMAL OPERATION BELOW ----
 
   knobRaw = analogRead(KNOB_PIN);
   knobLevel = map(knobRaw, 0, 4095, 0, 10);
@@ -262,7 +274,48 @@ void loop() {
   DBG2("Temp", temp_c);
 
   set_temp(knobLevel);
+}
 
-  delay(1000);
+
+/* ===================== LED MS Setting, Instead of Delay ===================== */
+void updateStatusLED() {
+  unsigned long now = millis();
+
+  // AP mode → fast blink
+  if (WiFi.getMode() & WIFI_MODE_AP) {
+    if (now - lastLedUpdateMs >= LED_AP_INTERVAL_MS) {
+      lastLedUpdateMs = now;
+      yellowLedState = !yellowLedState;
+      digitalWrite(YELLOW_LED, yellowLedState);
+    }
+  }
+  // Disconnected → slow blink
+  else if (WiFi.status() != WL_CONNECTED) {
+    if (now - lastLedUpdateMs >= LED_DIS_INTERVAL_MS) {
+      lastLedUpdateMs = now;
+      yellowLedState = !yellowLedState;
+      digitalWrite(YELLOW_LED, yellowLedState);
+    }
+  }
+  // Connected → LED off
+  else {
+    digitalWrite(YELLOW_LED, LOW);
+    yellowLedState = false;
+  }
+}
+
+/* ===================== LOOP ===================== */
+void loop() {
+  server.handleClient();
+  checkButton();
+
+  // During reset → everything OFF
+  if (resetInProgress) {
+    digitalWrite(RELAY_PIN, LOW);
+    return;
+  }
+
+  updateStatusLED();
+  updateTemperatureControl();
 }
 
