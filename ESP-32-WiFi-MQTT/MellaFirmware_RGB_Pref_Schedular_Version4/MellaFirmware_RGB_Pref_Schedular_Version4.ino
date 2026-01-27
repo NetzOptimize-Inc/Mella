@@ -51,6 +51,9 @@ PubSubClient mqttClient(espClient);
 
 bool resetInProgress = false;
 bool systemReady = false;
+
+bool bootComplete = false;   // blocks heater until system is fully ready
+
 /* ===================== SCHEDULER ===================== */
 
 struct DaySchedule {
@@ -438,7 +441,7 @@ bool loadScheduleFromPrefs() {
     return false;
   }
 
-  schedulerEnabled = prefs.getBool("enabled", false);
+  schedulerEnabled = prefs.getBool("enabled", true); // default TRUE
 
   for (int i = 0; i < 7; i++) {
     String key = "d" + String(i);
@@ -448,8 +451,10 @@ bool loadScheduleFromPrefs() {
   prefs.end();
 
   DBG("[SCHED] Schedule loaded from Preferences");
+  DBG2("[SCHED] Global enabled", schedulerEnabled ? "YES" : "NO");
   return true;
 }
+
 
 /* ============== Force AP mode explicitly ============ */
 void startProvisioningAP() {
@@ -469,75 +474,85 @@ void startProvisioningAP() {
 void setup() {
   Serial.begin(115200);
 
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, LOW);   // 🔒 HARD OFF at power-on
+
   pinMode(RED_LED, OUTPUT);
   pinMode(YELLOW_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
-  pinMode(RELAY_PIN, OUTPUT);
   pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
 
-  digitalWrite(RELAY_PIN, LOW);
-
+  // ---- Sensors init (safe) ----
   sensors.begin();
   sensors.getAddress(mainThermometer, 0);
 
-  String ssid, pass;
-  bool hasWiFi = loadWiFi(ssid, pass);
-
-  if (hasWiFi) {
-    DBG("[WIFI] Connecting to saved WiFi");
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid.c_str(), pass.c_str());
-
-    unsigned long start = millis();
-    while (millis() - start < CONNECT_TIMEOUT_MS) {
-      if (WiFi.status() == WL_CONNECTED) {
-        systemReady = true;
-        DBG("[WIFI] Connected");
-        break;
-      }
-      delay(200);
-    }
-
-    if (!systemReady) {
-      DBG("[WIFI] Connection failed");
-      startProvisioningAP();
-    }
-  } else {
-    startProvisioningAP();
-  }
-
-  setupWeb();
+  // ---- Restore scheduler FIRST ----
   if (!loadScheduleFromPrefs()) {
     setDefaultSchedule();
     saveScheduleToPrefs();
   }
 
-  // ===== TEMP TEST SCHEDULE (STEP 2 ONLY) =====
-  schedulerEnabled = true;
-  weekSchedule[2] = { 10, 0, 11, 0, true };
+  // ===== Fix-2: Auto-enable scheduler if any day is enabled =====
+  bool anyDayEnabled = false;
 
-  DBG("[TEST] Temporary scheduler loaded");
-  // ===========================================
+  for (int i = 0; i < 7; i++) {
+    if (weekSchedule[i].enabled) {
+      anyDayEnabled = true;
+      break;
+    }
+  }
 
+  if (anyDayEnabled) {
+    schedulerEnabled = true;
+    DBG("[SCHED] Auto-enabled (at least one day active)");
+  } else {
+    DBG("[SCHED] All days disabled");
+  }
 
+  // ---- Restore time BEFORE WiFi ----
   deviceEpoch = loadEpoch();
-
   if (deviceEpoch == 0) {
-    // Default to Monday 00:00 (safe baseline)
-    DBG("[TIME] No saved time, using default");
-    setDeviceTime(1700000000); // fixed safe epoch
+    DBG("[TIME] No saved time, using safe default");
+    setDeviceTime(1700000000);
   } else {
     DBG("[TIME] Time restored from memory");
     lastEpochUpdateMs = millis();
   }
 
+  // ---- WiFi handling (unchanged) ----
+  String ssid, pass;
+  bool hasWiFi = loadWiFi(ssid, pass);
+  if (hasWiFi) {
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid.c_str(), pass.c_str());
+    unsigned long start = millis();
+    while (millis() - start < CONNECT_TIMEOUT_MS) {
+      if (WiFi.status() == WL_CONNECTED) {
+        systemReady = true;
+        break;
+      }
+      delay(200);
+    }
+    if (!systemReady) startProvisioningAP();
+  } else {
+    startProvisioningAP();
+  }
+
+  setupWeb();
+
+  bootComplete = true;   // ✅ NOW the system may control the heater
   DBG("System ready");
 }
+
 
 
 /* ============== Reading Sensor and Appling Heater Logic ============ */
 
 void updateTemperatureControl() {
+  if (!bootComplete) {
+    digitalWrite(RELAY_PIN, LOW);
+    return;
+  }
 
   unsigned long now = millis();
   if (now - lastSensorReadMs < SENSOR_INTERVAL_MS) return;
