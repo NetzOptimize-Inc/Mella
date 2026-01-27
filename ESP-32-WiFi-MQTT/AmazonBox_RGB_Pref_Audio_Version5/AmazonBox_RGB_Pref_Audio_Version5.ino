@@ -3,6 +3,15 @@
    Version-3 Core Logic PRESERVED
    ONLY LED logic refactored using ENUM
    ====================================================== */
+/*
+FLASH LAYOUT:
+- Code: Uploaded via Arduino IDE 2.x
+- SPIFFS (MP3): Uploaded via Arduino IDE 1.8 (ESP32FS)
+- Preferences:
+  - device/id → persistent
+  - wifi/*    → cleared on factory reset
+DO NOT CHANGE PARTITION SCHEME AFTER DEPLOYMENT
+*/
 // Code is running properly without any issue.
 // Yellow Light: Not connected OR APMode Publish
 // GREEN Light: Connected, Door Open. As soon as Green Light Gets Off, Means everything is working and Door is closed. 
@@ -34,6 +43,12 @@
 #include <Preferences.h>
 #include <PubSubClient.h>
 #include <ESP32Servo.h>
+/* ======== AUdio MAX98357A ======================== */
+#include "SPIFFS.h"
+#include "AudioFileSourceSPIFFS.h"
+#include "AudioGeneratorMP3.h"
+#include "AudioOutputI2S.h"
+
 
 /* ===================== DEBUG ===================== */
 #define DEBUG 1
@@ -57,8 +72,24 @@
 #define YELLOW_LED  4
 #define GREEN_LED   16
 
+/* ================AUDIO GPIO PINS  ======================*/
+#define I2S_BCLK 26
+#define I2S_LRC  27
+#define I2S_DOUT 22
+
+AudioGeneratorMP3 *mp3;
+AudioFileSourceSPIFFS *file;
+AudioOutputI2S *out;
+
+
+unsigned long doorOpenMs = 0;
+unsigned long lastStillHighMs = 0;
+
+bool stillHighActive = false;
+int highPlayCount = 0;
+
 /* ===================== SERVO PINS ===================== */
-#define SERVO_PIN 2
+#define SERVO_PIN 13
 #define SERVO_OPEN_ANGLE 0
 #define SERVO_CLOSED_ANGLE 90
 
@@ -79,7 +110,7 @@ enum DeviceState {
 };
 
 volatile DeviceState deviceState = STATE_BOOTING;
-
+DeviceState prevDoorState = STATE_BOOTING;  // Audio Purpose
 /* ===================== GLOBALS ===================== */
 volatile bool resetInProgress = false;
 Preferences prefs;
@@ -388,7 +419,87 @@ void checkButton() {
 }
 
 
+/* ============== MP3 Function =====================*/
+void playMP3(const char *path) {
+  if (!SPIFFS.exists(path)) {
+    DBG("MP3 not found:");
+    DBG(path);
+    return;
+  }
 
+  if (!mp3 || !out) return;
+  if (mp3->isRunning()) mp3->stop();
+  file = new AudioFileSourceSPIFFS(path);
+  mp3->begin(file, out);
+}
+
+
+/* ========= MP3 Audio Function ================== */
+void handleDoorAudio() {
+  unsigned long now = millis();
+
+  if (deviceState == STATE_DOOR_CLOSED && mp3 && mp3->isRunning()) {
+    mp3->stop();
+  }
+  // ---- DOOR OPEN ----
+  if (deviceState == STATE_DOOR_OPEN && prevDoorState != STATE_DOOR_OPEN) {
+    doorOpenMs = now;
+    lastStillHighMs = 0;
+    stillHighActive = false;
+    highPlayCount = 0;
+
+    playMP3("/high.mp3");
+    highPlayCount = 1;
+  }
+
+  // second repeat of high.mp3
+  if (deviceState == STATE_DOOR_OPEN &&
+      highPlayCount == 1 &&
+      !mp3->isRunning()) {
+
+    playMP3("/high.mp3");
+    highPlayCount = 2;
+  }
+
+  // after 5 sec → still-high
+  if (deviceState == STATE_DOOR_OPEN &&
+      !stillHighActive &&
+      now - doorOpenMs >= 5000) {
+
+    stillHighActive = true;
+    lastStillHighMs = now;
+    playMP3("/still-high.mp3");
+  }
+
+  // repeat every 8 sec
+  if (deviceState == STATE_DOOR_OPEN &&
+      stillHighActive &&
+      !mp3->isRunning() &&
+      now - lastStillHighMs >= 8000) {
+
+    lastStillHighMs = now;
+    playMP3("/still-high.mp3");
+  }
+
+  // ---- DOOR CLOSED ----
+  if (deviceState == STATE_DOOR_CLOSED &&
+      prevDoorState == STATE_DOOR_OPEN) {
+
+    stillHighActive = false;
+    highPlayCount = 0;
+    playMP3("/low.mp3");
+  }
+
+  prevDoorState = deviceState;
+
+  if (mp3 && mp3->isRunning()) {
+    mp3->loop();
+    if (mp3 && !mp3->isRunning() && file) {
+      delete file;
+      file = nullptr;
+    }
+  }
+}
 
 /* ===================== SETUP ===================== */
 void setup() {
@@ -408,6 +519,16 @@ void setup() {
 
   lockServo.attach(SERVO_PIN);
   lockServo.write(SERVO_CLOSED_ANGLE); // Start locked
+
+  if (!SPIFFS.begin(false)) {
+    DBG("SPIFFS mount failed!");
+  }
+
+  out = new AudioOutputI2S();
+  out->SetPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+  out->SetGain(0.8);
+
+  mp3 = new AudioGeneratorMP3();
 
   clearAllLEDs();
   deviceState = STATE_BOOTING;
@@ -630,6 +751,7 @@ void loop() {
   mqttClient.loop();
   checkButton();
   updateLEDState();
+  handleDoorAudio();
 
   unsigned long now = millis();
 
