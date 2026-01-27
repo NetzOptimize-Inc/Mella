@@ -1,4 +1,5 @@
-// The project is working fine, without any error (EXCEPT The Mobile Scheduler Part)
+// The project is working fine, without any error (EXCEPT ONLINE Mobile Scheduler Part)
+// In this version we are working on OFFLINE Scheduler
 // The New Chip does not have any detail
 // The Device Generates the Device ID, This device ID never erase 
 // The APMode starts, WiFi APMode Populates, The Customer selects the WiFi, name starts with MELLA-XXXX, The PAssword is setup1234
@@ -8,6 +9,7 @@
 // The Device Connects (GREEN LED for 3 Sec. to show conformation that everything is working)
 // BLUE LED shows that it SwitchedOn the RELAY and Heat is in ON State, below Thrash hold level or Knob Level
 
+#include <time.h>
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
 #include <WiFi.h>
@@ -73,7 +75,21 @@ unsigned long lastLedUpdateMs  = 0;
 #define LED_DIS_INTERVAL_MS 500
 
 bool yellowLedState = false;
+/* ===================== TIME ENGINE ===================== */
+time_t deviceEpoch = 0;
+unsigned long lastEpochUpdateMs = 0;
 
+#define EPOCH_SYNC_INTERVAL_MS 60000  // 1 minute
+
+int getCurrentDay();     // 0 = Sunday ... 6 = Saturday
+int getCurrentHour();    // 0–23
+int getCurrentMinute();  // 0–59
+
+// ADDED FOR FAKE OVERRIDE "DEBUGGING"
+bool manualTimeOverride = false;
+int manualDay = 0;
+int manualHour = 0;
+int manualMin = 0;
 
 /* ===================== TEMP ===================== */
 OneWire oneWire(ONE_WIRE_BUS);
@@ -89,6 +105,157 @@ int default_temp = 30;
 /* ===================== RESET BUTTON ===================== */
 #define LONG_PRESS_MS 1000
 
+/* ==================== Scheduler Decision Function (CORE LOGIC) ====== */
+bool isScheduleActiveNow() {
+  if (!schedulerEnabled) {
+    DBG("[SCHED] Scheduler globally disabled");
+    return false;
+  }
+
+  int today = getCurrentDay();
+  int hour  = getCurrentHour();
+  int min   = getCurrentMinute();
+
+  DaySchedule &d = weekSchedule[today];
+
+  if (!d.enabled) {
+    DBG("[SCHED] Today disabled");
+    return false;
+  }
+
+  int nowMin   = hour * 60 + min;
+  int startMin = d.startHour * 60 + d.startMin;
+  int endMin   = d.endHour * 60 + d.endMin;
+
+  // Normal same-day window
+  if (startMin <= endMin) {
+    return (nowMin >= startMin && nowMin < endMin);
+  }
+
+  // Overnight window (e.g. 22:00 → 06:00)
+  return (nowMin >= startMin || nowMin < endMin);
+}
+
+/* ====================== Time Scheduler ================  */
+void saveEpoch(time_t epoch) {
+  prefs.begin("time", false);
+  prefs.putULong("epoch", (uint32_t)epoch);
+  prefs.end();
+}
+
+time_t loadEpoch() {
+  prefs.begin("time", true);
+  time_t epoch = prefs.getULong("epoch", 0);
+  prefs.end();
+  return epoch;
+}
+
+/* ====== Set device time (used later by mobile / NTP)  ====  */
+void setDeviceTime(time_t epoch) {
+  deviceEpoch = epoch;
+  lastEpochUpdateMs = millis();
+  saveEpoch(epoch);
+
+  struct timeval tv;
+  tv.tv_sec = epoch;
+  tv.tv_usec = 0;
+  settimeofday(&tv, NULL);
+
+  DBG("[TIME] Device time set");
+}
+
+/* =============== Update device time (offline tick) =========================*/
+void updateDeviceTime() {
+  unsigned long now = millis();
+
+  if (now - lastEpochUpdateMs >= EPOCH_SYNC_INTERVAL_MS) {
+    deviceEpoch += (now - lastEpochUpdateMs) / 1000;
+    lastEpochUpdateMs = now;
+    saveEpoch(deviceEpoch);
+
+    // 🔍 TEMP DEBUG (can be removed later)
+    DBG("----- TIME DEBUG -----");
+    DBG2("DAY", getCurrentDay());     // 0 = Sunday
+    DBG2("HOUR", getCurrentHour());
+    DBG2("MIN", getCurrentMinute());
+    DBG("----------------------");
+  }
+}
+
+/* ==============   Read current day & time (CORE API)      ================*/
+int getCurrentDay() {
+  if (manualTimeOverride) return manualDay;
+  struct tm timeinfo;
+  localtime_r(&deviceEpoch, &timeinfo);
+  return timeinfo.tm_wday;
+}
+
+int getCurrentHour() {
+  if (manualTimeOverride) return manualHour;
+  struct tm timeinfo;
+  localtime_r(&deviceEpoch, &timeinfo);
+  return timeinfo.tm_hour;
+}
+
+int getCurrentMinute() {
+  if (manualTimeOverride) return manualMin;
+  struct tm timeinfo;
+  localtime_r(&deviceEpoch, &timeinfo);
+  return timeinfo.tm_min;
+}
+
+/* =================  HANDLE SERIAL COMMAND HANDLER ========  */
+void handleSerialCommands() {
+  if (!Serial.available()) return;
+
+  String cmd = Serial.readStringUntil('\n');
+  cmd.trim();
+
+  if (cmd == "sched on") {
+    schedulerEnabled = true;
+    DBG("[CMD] Scheduler ENABLED");
+  }
+  else if (cmd == "sched off") {
+    schedulerEnabled = false;
+    DBG("[CMD] Scheduler DISABLED");
+  }
+  else if (cmd.startsWith("setday")) {
+    manualDay = cmd.substring(7).toInt();
+    manualTimeOverride = true;
+    DBG2("[CMD] Day set", manualDay);
+  }
+  else if (cmd.startsWith("settime")) {
+    sscanf(cmd.c_str(), "settime %d %d", &manualHour, &manualMin);
+    manualTimeOverride = true;
+    DBG("[CMD] Time overridden");
+  }
+  else if (cmd.startsWith("setwindow")) {
+    int sh, sm, eh, em;
+    sscanf(cmd.c_str(), "setwindow %d %d %d %d", &sh, &sm, &eh, &em);
+
+    weekSchedule[manualDay].startHour = sh;
+    weekSchedule[manualDay].startMin  = sm;
+    weekSchedule[manualDay].endHour   = eh;
+    weekSchedule[manualDay].endMin    = em;
+    weekSchedule[manualDay].enabled  = true;
+
+    DBG("[CMD] Schedule window set");
+  }
+  else if (cmd == "status") {
+    DBG("===== STATUS =====");
+    DBG2("DAY", getCurrentDay());
+    DBG2("HOUR", getCurrentHour());
+    DBG2("MIN", getCurrentMinute());
+    DBG2("ACTIVE", isScheduleActiveNow() ? "YES" : "NO");
+    DBG("==================");
+  }
+  else if (cmd == "realtime") {
+    manualTimeOverride = false;
+    DBG("[CMD] Back to real time");
+  }
+}
+
+/* ====================== Reset Button Code ================  */
 void factoryReset() {
   DBG("[RESET] Factory reset initiated");
 
@@ -344,18 +511,39 @@ void setup() {
     setDefaultSchedule();
     saveScheduleToPrefs();
   }
+
+  // ===== TEMP TEST SCHEDULE (STEP 2 ONLY) =====
+  schedulerEnabled = true;
+  weekSchedule[2] = { 10, 0, 11, 0, true };
+
+  DBG("[TEST] Temporary scheduler loaded");
+  // ===========================================
+
+
+  deviceEpoch = loadEpoch();
+
+  if (deviceEpoch == 0) {
+    // Default to Monday 00:00 (safe baseline)
+    DBG("[TIME] No saved time, using default");
+    setDeviceTime(1700000000); // fixed safe epoch
+  } else {
+    DBG("[TIME] Time restored from memory");
+    lastEpochUpdateMs = millis();
+  }
+
   DBG("System ready");
 }
 
 
 /* ============== Reading Sensor and Appling Heater Logic ============ */
+
 void updateTemperatureControl() {
+
   unsigned long now = millis();
   if (now - lastSensorReadMs < SENSOR_INTERVAL_MS) return;
   lastSensorReadMs = now;
 
-  // 🚨 SAFETY GUARD — heater must NEVER run in AP / disconnected state
-  // 🚨 ABSOLUTE SAFETY GUARD
+  // 🔒 Absolute safety: system not ready
   if (!systemReady) {
     if (digitalRead(RELAY_PIN) == HIGH) {
       heatOff();
@@ -364,9 +552,16 @@ void updateTemperatureControl() {
     return;
   }
 
+  // ⛔ Scheduler gate (MASTER CONTROL)
+  if (!isScheduleActiveNow()) {
+    if (digitalRead(RELAY_PIN) == HIGH) {
+      heatOff();
+      DBG("[SCHED] Outside schedule → Heater OFF");
+    }
+    return;
+  }
 
-  // ---- NORMAL OPERATION BELOW ----
-
+  // 🔥 Allowed → temperature logic
   knobRaw = analogRead(KNOB_PIN);
   knobLevel = map(knobRaw, 0, 4095, 0, 10);
   knobLevel = constrain(knobLevel, 0, 10);
@@ -380,6 +575,8 @@ void updateTemperatureControl() {
 
   set_temp(knobLevel);
 }
+
+
 
 
 /* ===================== LED MS Setting, Instead of Delay ===================== */
@@ -414,6 +611,8 @@ void updateStatusLED() {
 
 /* ===================== LOOP ===================== */
 void loop() {
+
+  handleSerialCommands();
   server.handleClient();
   checkButton();
 
@@ -423,7 +622,23 @@ void loop() {
     return;
   }
 
+  updateDeviceTime();
   updateStatusLED();
   updateTemperatureControl();
+  static unsigned long lastSchedDbg = 0;
+
+  // TEMP Debug Hook (No Heater Yet)
+  if (millis() - lastSchedDbg > 60000) {  // once per minute
+    lastSchedDbg = millis();
+
+    bool active = isScheduleActiveNow();
+    DBG("===== SCHEDULER CHECK =====");
+    DBG2("DAY", getCurrentDay());
+    DBG2("HOUR", getCurrentHour());
+    DBG2("MIN", getCurrentMinute());
+    DBG2("ACTIVE", active ? "YES" : "NO");
+    DBG("===========================");
+  }
+
 }
 
