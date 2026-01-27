@@ -54,6 +54,11 @@ bool systemReady = false;
 
 bool bootComplete = false;   // blocks heater until system is fully ready
 
+bool heatingAllowed = false;
+
+unsigned long lastSchedulerCheckMs = 0;
+#define SCHEDULER_CHECK_INTERVAL_MS 60000   // 1 minute
+
 /* ===================== SCHEDULER ===================== */
 
 struct DaySchedule {
@@ -166,6 +171,40 @@ void setDeviceTime(time_t epoch) {
 
   DBG("[TIME] Device time set");
 }
+
+/* =============== Update Scheduler → Permission Mapping =========================*/
+void updateSchedulerPermission() {
+
+  // 🚨 Boot guard
+  if (!bootComplete) {
+    heatingAllowed = false;
+    heatOff();
+    return;
+  }
+
+  // 🚨 Global scheduler OFF
+  if (!schedulerEnabled) {
+    heatingAllowed = false;
+    heatOff();
+    DBG("[SCHED] Scheduler globally disabled");
+    return;
+  }
+
+  bool active = isScheduleActiveNow();
+
+  if (active != heatingAllowed) {
+    DBG(active
+      ? "[SCHED] Inside schedule → Heating allowed"
+      : "[SCHED] Outside schedule → Heating blocked");
+  }
+
+  heatingAllowed = active;
+
+  if (!heatingAllowed) {
+    heatOff();
+  }
+}
+
 
 /* =============== Update device time (offline tick) =========================*/
 void updateDeviceTime() {
@@ -541,6 +580,11 @@ void setup() {
   setupWeb();
 
   bootComplete = true;   // ✅ NOW the system may control the heater
+
+  heatingAllowed = false;
+  heatOff();
+
+
   DBG("System ready");
 }
 
@@ -549,34 +593,17 @@ void setup() {
 /* ============== Reading Sensor and Appling Heater Logic ============ */
 
 void updateTemperatureControl() {
-  if (!bootComplete) {
-    digitalWrite(RELAY_PIN, LOW);
-    return;
-  }
-
   unsigned long now = millis();
   if (now - lastSensorReadMs < SENSOR_INTERVAL_MS) return;
   lastSensorReadMs = now;
 
-  // 🔒 Absolute safety: system not ready
-  if (!systemReady) {
-    if (digitalRead(RELAY_PIN) == HIGH) {
-      heatOff();
-      DBG("[SAFETY] Heater OFF — system not ready");
-    }
+  // Absolute safety
+  if (!systemReady || !heatingAllowed) {
+    heatOff();
     return;
   }
 
-  // ⛔ Scheduler gate (MASTER CONTROL)
-  if (!isScheduleActiveNow()) {
-    if (digitalRead(RELAY_PIN) == HIGH) {
-      heatOff();
-      DBG("[SCHED] Outside schedule → Heater OFF");
-    }
-    return;
-  }
-
-  // 🔥 Allowed → temperature logic
+  // Normal temperature logic
   knobRaw = analogRead(KNOB_PIN);
   knobLevel = map(knobRaw, 0, 4095, 0, 10);
   knobLevel = constrain(knobLevel, 0, 10);
@@ -584,14 +611,8 @@ void updateTemperatureControl() {
   sensors.requestTemperatures();
   temp_c = sensors.getTempC(mainThermometer);
 
-  DBG2("Knob Raw", knobRaw);
-  DBG2("Knob Level", knobLevel);
-  DBG2("Temp", temp_c);
-
   set_temp(knobLevel);
 }
-
-
 
 
 /* ===================== LED MS Setting, Instead of Delay ===================== */
@@ -638,6 +659,13 @@ void loop() {
   }
 
   updateDeviceTime();
+  static unsigned long lastSchedulerCheckMs = 0;
+
+  if (millis() - lastSchedulerCheckMs >= 60000) {
+    lastSchedulerCheckMs = millis();
+    updateSchedulerPermission();
+  }
+
   updateStatusLED();
   updateTemperatureControl();
   static unsigned long lastSchedDbg = 0;
