@@ -172,6 +172,11 @@ void setDeviceTime(time_t epoch) {
   DBG("[TIME] Device time set");
 }
 
+/* =============Force immediate scheduler evaluation =============================*/
+void reevaluateSchedulerNow() {
+  updateSchedulerPermission();
+}
+
 /* =============== Update Scheduler → Permission Mapping =========================*/
 void updateSchedulerPermission() {
 
@@ -246,6 +251,36 @@ int getCurrentMinute() {
   return timeinfo.tm_min;
 }
 
+/* =========== Add helper to print one day ===================*/
+void dumpSchedule() {
+  DBG("===== SCHEDULE DUMP =====");
+  DBG2("Scheduler Enabled", schedulerEnabled ? "YES" : "NO");
+
+  for (int i = 0; i < 7; i++) {
+    Serial.print("Day ");
+    Serial.print(i);
+    Serial.print(" : ");
+
+    if (!weekSchedule[i].enabled) {
+      Serial.println("DISABLED");
+      continue;
+    }
+
+    Serial.print("ENABLED  ");
+    Serial.print(weekSchedule[i].startHour);
+    Serial.print(":");
+    if (weekSchedule[i].startMin < 10) Serial.print("0");
+    Serial.print(weekSchedule[i].startMin);
+    Serial.print("  ->  ");
+    Serial.print(weekSchedule[i].endHour);
+    Serial.print(":");
+    if (weekSchedule[i].endMin < 10) Serial.print("0");
+    Serial.println(weekSchedule[i].endMin);
+  }
+
+  DBG("==========================");
+}
+
 /* =================  HANDLE SERIAL COMMAND HANDLER ========  */
 void handleSerialCommands() {
   if (!Serial.available()) return;
@@ -255,10 +290,13 @@ void handleSerialCommands() {
 
   if (cmd == "sched on") {
     schedulerEnabled = true;
+    saveScheduleToPrefs();
+    reevaluateSchedulerNow();
     DBG("[CMD] Scheduler ENABLED");
   }
   else if (cmd == "sched off") {
     schedulerEnabled = false;
+    saveScheduleToPrefs();   // ✅ ADD THIS
     DBG("[CMD] Scheduler DISABLED");
   }
   else if (cmd.startsWith("setday")) {
@@ -269,6 +307,7 @@ void handleSerialCommands() {
   else if (cmd.startsWith("settime")) {
     sscanf(cmd.c_str(), "settime %d %d", &manualHour, &manualMin);
     manualTimeOverride = true;
+    reevaluateSchedulerNow();
     DBG("[CMD] Time overridden");
   }
   else if (cmd.startsWith("setwindow")) {
@@ -281,7 +320,9 @@ void handleSerialCommands() {
     weekSchedule[manualDay].endMin    = em;
     weekSchedule[manualDay].enabled  = true;
 
-    DBG("[CMD] Schedule window set");
+    saveScheduleToPrefs();   // ✅ CRITICAL FIX
+    reevaluateSchedulerNow();
+    DBG("[CMD] Schedule window set & applied/Saved");
   }
   else if (cmd == "status") {
     DBG("===== STATUS =====");
@@ -294,6 +335,9 @@ void handleSerialCommands() {
   else if (cmd == "realtime") {
     manualTimeOverride = false;
     DBG("[CMD] Back to real time");
+  }
+  else if (cmd == "sched dump") {
+    dumpSchedule();
   }
 }
 
@@ -480,7 +524,23 @@ bool loadScheduleFromPrefs() {
     return false;
   }
 
-  schedulerEnabled = prefs.getBool("enabled", true); // default TRUE
+  bool valid = true;
+
+  for (int i = 0; i < 7; i++) {
+    String key = "d" + String(i);
+    if (!prefs.isKey(key.c_str())) {
+      valid = false;
+      break;
+    }
+  }
+
+  if (!valid) {
+    prefs.end();
+    DBG("[SCHED] Schedule data incomplete");
+    return false;
+  }
+
+  schedulerEnabled = prefs.getBool("enabled", false);
 
   for (int i = 0; i < 7; i++) {
     String key = "d" + String(i);
@@ -526,10 +586,14 @@ void setup() {
   sensors.getAddress(mainThermometer, 0);
 
   // ---- Restore scheduler FIRST ----
-  if (!loadScheduleFromPrefs()) {
+  bool schedLoaded = loadScheduleFromPrefs();
+
+  if (!schedLoaded) {
+    DBG("[SCHED] No saved schedule, applying defaults");
     setDefaultSchedule();
     saveScheduleToPrefs();
   }
+
 
   // ===== Fix-2: Auto-enable scheduler if any day is enabled =====
   bool anyDayEnabled = false;
@@ -541,12 +605,15 @@ void setup() {
     }
   }
 
-  if (anyDayEnabled) {
+  if (anyDayEnabled && !schedulerEnabled) {
     schedulerEnabled = true;
+    saveScheduleToPrefs();
     DBG("[SCHED] Auto-enabled (at least one day active)");
-  } else {
-    DBG("[SCHED] All days disabled");
   }
+  else if (!anyDayEnabled) {
+    DBG("[SCHED] No active days configured");
+  }
+
 
   // ---- Restore time BEFORE WiFi ----
   deviceEpoch = loadEpoch();
@@ -580,7 +647,7 @@ void setup() {
   setupWeb();
 
   bootComplete = true;   // ✅ NOW the system may control the heater
-
+  updateSchedulerPermission();   // ✅ immediate evaluation
   heatingAllowed = false;
   heatOff();
 
@@ -603,7 +670,6 @@ void updateTemperatureControl() {
     return;
   }
 
-  // Normal temperature logic
   knobRaw = analogRead(KNOB_PIN);
   knobLevel = map(knobRaw, 0, 4095, 0, 10);
   knobLevel = constrain(knobLevel, 0, 10);
@@ -613,6 +679,7 @@ void updateTemperatureControl() {
 
   set_temp(knobLevel);
 }
+
 
 
 /* ===================== LED MS Setting, Instead of Delay ===================== */
@@ -658,8 +725,8 @@ void loop() {
     return;
   }
 
-  updateDeviceTime();
   static unsigned long lastSchedulerCheckMs = 0;
+  updateDeviceTime();
 
   if (millis() - lastSchedulerCheckMs >= 60000) {
     lastSchedulerCheckMs = millis();
