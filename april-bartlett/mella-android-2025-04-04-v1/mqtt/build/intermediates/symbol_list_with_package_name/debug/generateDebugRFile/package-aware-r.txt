@@ -1,4 +1,0 @@
-mqtt
-mipmap ic_launcher
-style AppBaseTheme
-style AppTheme
