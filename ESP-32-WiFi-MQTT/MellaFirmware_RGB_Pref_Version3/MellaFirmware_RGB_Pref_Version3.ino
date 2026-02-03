@@ -1,4 +1,5 @@
-// The project is working fine, without any error (EXCEPT The Mobile Scheduler Part)
+// Development Board: ESP32 Dev Module
+// The project is working fine, without any error (EXCEPT MQTT/ Scheduler/The Mobile Scheduler Part)
 // The New Chip does not have any detail
 // The Device Generates the Device ID, This device ID never erase 
 // The APMode starts, WiFi APMode Populates, The Customer selects the WiFi, name starts with MELLA-XXXX, The PAssword is setup1234
@@ -95,21 +96,21 @@ void factoryReset() {
   resetInProgress = true;
   systemReady = false;
 
-  // 1️⃣ Stop heater immediately
+  // Stop heater immediately
   digitalWrite(RELAY_PIN, LOW);
   DBG("[RESET] Heater OFF");
 
-  // 2️⃣ Stop WiFi cleanly
+  // Stop WiFi cleanly
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
 
-  // 3️⃣ Clear ONLY WiFi credentials (not device ID)
+  // Clear ONLY WiFi credentials (not device ID)
   prefs.begin("wifi", false);
   prefs.clear();
   prefs.end();
   DBG("[RESET] WiFi credentials cleared");
 
-  // 4️⃣ Visual feedback
+  // Visual feedback
   for (int i = 0; i < 5; i++) {
     digitalWrite(RED_LED, HIGH);
     delay(200);
@@ -293,7 +294,7 @@ void startProvisioningAP() {
   delay(200);
 
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(("Mella-" + getAPId()).c_str(), AP_PASSWORD);
+  WiFi.softAP(("MELLA-" + getAPId()).c_str(), AP_PASSWORD);
 
   systemReady = false;
 }
@@ -354,8 +355,8 @@ void updateTemperatureControl() {
   if (now - lastSensorReadMs < SENSOR_INTERVAL_MS) return;
   lastSensorReadMs = now;
 
-  // 🚨 SAFETY GUARD — heater must NEVER run in AP / disconnected state
-  // 🚨 ABSOLUTE SAFETY GUARD
+  // SAFETY GUARD — heater must NEVER run in AP / disconnected state
+  // ABSOLUTE SAFETY GUARD
   if (!systemReady) {
     if (digitalRead(RELAY_PIN) == HIGH) {
       heatOff();

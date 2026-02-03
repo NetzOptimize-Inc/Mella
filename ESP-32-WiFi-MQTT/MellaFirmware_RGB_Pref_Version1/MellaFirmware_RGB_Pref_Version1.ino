@@ -1,15 +1,16 @@
 /* ================= MellaFirmware_Version 1 =================
    Everything is working for now in this Version and in GIT First Commit.   
    ====================================================== */
+// Development Board: ESP32 Dev Module
 // Yellow Light: Not connected OR APMode Publish
-// GREEN Light: Connected, Door Open. As soon as Green Light Gets Off, Means everything is working and Door is closed. 
+// GREEN Light: Connected, Component HIGH State. As soon as Green Light Gets Off, Means everything is working and Component is LOW. 
 // BLUE LIGHT: The Power is ON on that GPIO that can be used to RELAY (It i snot working for now) 
 // NOTE : The code started working after adding 10KOmps of Register. 3V to GPIO25. Please note that GPIO25 is also connected to Push Button 
 // Push Button Wiring: One Pin to GND and another PIN to GPIO25. 
 
 
-// AmazonBox-B77D/cmd 
-// OPEN AND CLOSE
+// MELLA-B77D/cmd 
+// HIGH AND LOW
 // Password: setup1234
 // NOTE: The Project is working fine. The RESET Button is also working fine. 
 
@@ -196,7 +197,7 @@ String getPersistentAPId() {
 }
 
 String makeAPSSID() {
-  return String("AmazonBox-") + getPersistentAPId();
+  return String("MELLA-") + getPersistentAPId();
 }
 
 /* ===================== WIFI / AP (UNCHANGED) ===================== */
@@ -490,10 +491,10 @@ void setupWebServer() {
       "<html>"
       "<head>"
       "<meta charset='utf-8'>"
-      "<title>AmazonBox Wi-Fi Setup</title>"
+      "<title>MELLA Wi-Fi Setup</title>"
       "</head>"
       "<body>"
-      "<h2>AmazonBox - Wi-Fi Configuration</h2>"
+      "<h2>MELLA - Wi-Fi Configuration</h2>"
       "<p>Enter your Wi-Fi details below:</p>"
       "<form action='/save' method='post'>"
       "SSID:<br>"
