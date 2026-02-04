@@ -292,7 +292,7 @@ void startProvisioningAP() {
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
   delay(200);
-
+  digitalWrite(GREEN_LED, LOW);
   WiFi.mode(WIFI_AP);
   WiFi.softAP(("MELLA-" + getAPId()).c_str(), AP_PASSWORD);
 
@@ -305,6 +305,7 @@ void setup() {
 
   pinMode(RED_LED, OUTPUT);
   pinMode(YELLOW_LED, OUTPUT);
+  digitalWrite(YELLOW_LED, HIGH);   // BOOT INDICATOR
   pinMode(GREEN_LED, OUTPUT);
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
@@ -327,6 +328,12 @@ void setup() {
       if (WiFi.status() == WL_CONNECTED) {
         systemReady = true;
         DBG("[WIFI] Connected");
+        // GREEN confirmation
+        digitalWrite(YELLOW_LED, LOW);
+        digitalWrite(GREEN_LED, HIGH);
+        delay(3000);
+        digitalWrite(GREEN_LED, LOW);
+
         break;
       }
       delay(200);
