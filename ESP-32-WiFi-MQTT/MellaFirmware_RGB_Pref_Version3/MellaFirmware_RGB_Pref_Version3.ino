@@ -29,6 +29,7 @@
 #endif
 
 /* ===================== PINS ===================== */
+#define GREEN_BLINK_INTERVAL_MS 400
 #define RESET_BUTTON_PIN 25
 #define RED_LED     15
 #define YELLOW_LED  4
@@ -43,6 +44,7 @@
 #define CONNECT_TIMEOUT_MS 10000
 
 /* ===================== GLOBALS ===================== */
+
 Preferences prefs;
 WebServer server(80);
 WiFiClient espClient;
@@ -50,6 +52,7 @@ PubSubClient mqttClient(espClient);
 
 bool resetInProgress = false;
 bool systemReady = false;
+bool greenLedState = false;
 /* ===================== SCHEDULER ===================== */
 
 struct DaySchedule {
@@ -331,9 +334,6 @@ void setup() {
         // GREEN confirmation
         digitalWrite(YELLOW_LED, LOW);
         digitalWrite(GREEN_LED, HIGH);
-        delay(3000);
-        digitalWrite(GREEN_LED, LOW);
-
         break;
       }
       delay(200);
@@ -393,10 +393,33 @@ void updateTemperatureControl() {
 /* ===================== LED MS Setting, Instead of Delay ===================== */
 void updateStatusLED() {
   unsigned long now = millis();
-
   bool apActive = (WiFi.getMode() == WIFI_MODE_AP);
 
-  // AP mode → fast blink
+  /* ================= SYSTEM READY ================= */
+  if (systemReady) {
+    digitalWrite(YELLOW_LED, LOW);   // No warning
+
+    // Heater ON → GREEN blink
+    if (digitalRead(RELAY_PIN) == HIGH) {
+      if (now - lastLedUpdateMs >= GREEN_BLINK_INTERVAL_MS) {
+        lastLedUpdateMs = now;
+        greenLedState = !greenLedState;
+        digitalWrite(GREEN_LED, greenLedState);
+      }
+    }
+    // Heater OFF → GREEN solid
+    else {
+      greenLedState = true;
+      digitalWrite(GREEN_LED, HIGH);
+    }
+    return;
+  }
+
+  /* ================= NOT READY ================= */
+  digitalWrite(GREEN_LED, LOW);
+  greenLedState = false;
+
+  // AP mode → fast yellow blink
   if (apActive) {
     if (now - lastLedUpdateMs >= LED_AP_INTERVAL_MS) {
       lastLedUpdateMs = now;
@@ -404,20 +427,16 @@ void updateStatusLED() {
       digitalWrite(YELLOW_LED, yellowLedState);
     }
   }
-  // Not ready (disconnected / retrying) → slow blink
-  else if (!systemReady) {
+  // Disconnected / boot → slow yellow blink
+  else {
     if (now - lastLedUpdateMs >= LED_DIS_INTERVAL_MS) {
       lastLedUpdateMs = now;
       yellowLedState = !yellowLedState;
       digitalWrite(YELLOW_LED, yellowLedState);
     }
   }
-  // Fully connected → OFF
-  else {
-    digitalWrite(YELLOW_LED, LOW);
-    yellowLedState = false;
-  }
 }
+
 
 
 /* ===================== LOOP ===================== */
