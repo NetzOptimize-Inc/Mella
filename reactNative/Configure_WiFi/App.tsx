@@ -21,6 +21,10 @@ import WifiScanner from './src/components/WifiScanner';
 import InstructionsScreen from './src/components/InstructionsScreen';
 import PasswordInputScreen from './src/components/PasswordInputScreen';
 import DeviceList from './src/components/DeviceList';
+import MyKeepSetupScreen from './src/components/MyKeepSetupScreen';
+import MyKeepSettingsScreen from './src/components/MyKeepSettingsScreen';
+import MyKeepAccountScreen from './src/components/MyKeepAccountScreen';
+import MyKeepDevicesScreen from './src/components/MyKeepDevicesScreen';
 
 const DEVICE_STORAGE_KEY = '@saved_devices';
 
@@ -30,10 +34,13 @@ interface WiFiNetwork {
   level?: number;
 }
 
-type Screen = 'home' | 'instructions' | 'scanner' | 'password';
+type Screen = 'home' | 'mykeep' | 'instructions' | 'scanner' | 'password';
+
+type MyKeepTab = 'setup' | 'devices' | 'settings' | 'account';
 
 const App = () => {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('home');
+  const [currentScreen, setCurrentScreen] = useState<Screen>('mykeep');
+  const [myKeepTab, setMyKeepTab] = useState<MyKeepTab>('setup');
   const [selectedNetwork, setSelectedNetwork] = useState<WiFiNetwork | null>(
     null,
   );
@@ -86,6 +93,10 @@ const App = () => {
 
   const handleAddDevice = () => {
     setCurrentScreen('instructions');
+  };
+
+  const handleMyKeepNext = () => {
+    // Setup flow steps will be added later
   };
 
   const handleInstructionsOk = () => {
@@ -278,6 +289,21 @@ const App = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       {currentScreen === 'home' && renderHomeScreen()}
+
+      {currentScreen === 'mykeep' &&
+        (myKeepTab === 'settings' ? (
+          <MyKeepSettingsScreen onTab={setMyKeepTab} />
+        ) : myKeepTab === 'account' ? (
+          <MyKeepAccountScreen onTab={setMyKeepTab} />
+        ) : myKeepTab === 'devices' ? (
+          <MyKeepDevicesScreen onTab={setMyKeepTab} />
+        ) : (
+          <MyKeepSetupScreen
+            onNext={handleMyKeepNext}
+            onTab={setMyKeepTab}
+            activeTab={myKeepTab}
+          />
+        ))}
 
       {currentScreen === 'instructions' && (
         <InstructionsScreen
