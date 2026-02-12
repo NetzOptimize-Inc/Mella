@@ -1,8 +1,9 @@
 /**
  * Weekly scheduler UI: Device ID, day enable toggles, start/end times (01-24), Schedule button.
+ * Integrates with MQTT broker to publish schedule commands.
  */
 
-import React, {useState} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -14,8 +15,12 @@ import {
   Modal,
   FlatList,
   Pressable,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+// @ts-ignore - paho-mqtt types
+import {Client} from 'paho-mqtt';
 
 const ACCENT_ORANGE = '#FF6600';
 const PRIMARY_GREY = '#333333';
@@ -66,6 +71,58 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
     rowIndex: number;
     field: 'start' | 'end';
   } | null>(null);
+  const [mqttConnected, setMqttConnected] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [logMessages, setLogMessages] = useState<string[]>([]);
+  const mqttClientRef = useRef<Client | null>(null);
+
+  // MQTT connection using Paho MQTT
+  useEffect(() => {
+    const clientId = `mobile_${Math.random().toString(16).substr(2, 8)}`;
+    const host = 'broker.hivemq.com';
+    const port = 8884;
+    const path = '/mqtt';
+
+    try {
+      const client = new Client(host, Number(port), path, clientId);
+
+      client.onConnectionLost = (responseObject: any) => {
+        setMqttConnected(false);
+        addLog(`MQTT connection lost: ${responseObject.errorMessage || 'Unknown'}`);
+      };
+
+      client.onMessageArrived = (message: any) => {
+        // Handle incoming messages if needed
+      };
+
+      client.connect({
+        onSuccess: () => {
+          setMqttConnected(true);
+          addLog(`MQTT connected. Client ID: ${clientId}`);
+        },
+        onFailure: (error: any) => {
+          setMqttConnected(false);
+          addLog(`MQTT connection failed: ${error.errorMessage || 'Unknown error'}`);
+        },
+        useSSL: true,
+        cleanSession: true,
+      });
+
+      mqttClientRef.current = client;
+
+      return () => {
+        if (client && client.isConnected()) {
+          client.disconnect();
+        }
+      };
+    } catch (error: any) {
+      addLog(`MQTT initialization failed: ${error?.message || 'Unknown error'}`);
+    }
+  }, []);
+
+  const addLog = (message: string) => {
+    setLogMessages(prev => [...prev.slice(-9), message]);
+  };
 
   const updateDay = (index: number, patch: Partial<DaySchedule>) => {
     setSchedule(prev =>
@@ -81,8 +138,61 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
   };
 
   const handleSchedule = () => {
-    onSchedule?.(deviceId, schedule);
-    onBack();
+    const trimmedDeviceId = deviceId.trim();
+    if (!trimmedDeviceId) {
+      Alert.alert('Error', 'Please enter Device ID');
+      return;
+    }
+
+    if (!mqttConnected || !mqttClientRef.current || !mqttClientRef.current.isConnected()) {
+      Alert.alert('Error', 'MQTT not connected. Please wait...');
+      return;
+    }
+
+    setIsPublishing(true);
+
+    // Build days object matching PHP format
+    const daysObj: Record<number, any> = {};
+
+    schedule.forEach(day => {
+      if (day.enabled) {
+        daysObj[day.dayIndex] = {
+          en: true,
+          sh: day.startHour,
+          sm: 0,
+          eh: day.endHour,
+          em: 0,
+        };
+      } else {
+        daysObj[day.dayIndex] = {en: false};
+      }
+    });
+
+    const payload = {
+      version: 1,
+      enabled: true,
+      days: daysObj,
+    };
+
+    const topic = `mella/${trimmedDeviceId}/cmd/schedule`;
+    const message = JSON.stringify(payload);
+
+    try {
+      if (mqttClientRef.current) {
+        mqttClientRef.current.publish(topic, message, 0);
+        
+        setIsPublishing(false);
+        addLog(`Published to ${topic}`);
+        addLog(JSON.stringify(payload, null, 2));
+        Alert.alert('Success', 'Schedule published successfully', [
+          {text: 'OK', onPress: onBack},
+        ]);
+      }
+    } catch (err: any) {
+      setIsPublishing(false);
+      addLog(`Publish failed: ${err?.message || 'Unknown error'}`);
+      Alert.alert('Error', 'Failed to publish schedule');
+    }
   };
 
   const openTimeModal = (rowIndex: number, field: 'start' | 'end') => {
@@ -153,11 +263,40 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
         </View>
 
         <TouchableOpacity
-          style={styles.scheduleButton}
+          style={[
+            styles.scheduleButton,
+            (!mqttConnected || isPublishing) && styles.scheduleButtonDisabled,
+          ]}
           onPress={handleSchedule}
+          disabled={!mqttConnected || isPublishing}
           activeOpacity={0.85}>
-          <Text style={styles.scheduleButtonText}>Schedule</Text>
+          {isPublishing ? (
+            <ActivityIndicator color={BG_WHITE} />
+          ) : (
+            <Text style={styles.scheduleButtonText}>Schedule</Text>
+          )}
         </TouchableOpacity>
+
+        {logMessages.length > 0 && (
+          <View style={styles.logContainer}>
+            <Text style={styles.logTitle}>Log:</Text>
+            <ScrollView style={styles.logScroll}>
+              {logMessages.map((msg, idx) => (
+                <Text key={idx} style={styles.logText}>
+                  {msg}
+                </Text>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {!mqttConnected && (
+          <View style={styles.statusContainer}>
+            <Text style={styles.statusText}>
+              Connecting to MQTT broker...
+            </Text>
+          </View>
+        )}
       </ScrollView>
 
       <Modal
@@ -344,6 +483,41 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: ACCENT_ORANGE,
     fontWeight: '600',
+  },
+  scheduleButtonDisabled: {
+    opacity: 0.5,
+  },
+  logContainer: {
+    marginTop: 20,
+    backgroundColor: BG_WHITE,
+    borderRadius: 8,
+    padding: 12,
+    maxHeight: 150,
+  },
+  logTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: PRIMARY_GREY,
+    marginBottom: 8,
+  },
+  logScroll: {
+    maxHeight: 120,
+  },
+  logText: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    color: SECONDARY_GREY,
+    marginBottom: 2,
+  },
+  statusContainer: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: '#FFF3CD',
+    borderRadius: 8,
+  },
+  statusText: {
+    fontSize: 13,
+    color: '#856404',
   },
 });
 
