@@ -75,6 +75,7 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
   const [isPublishing, setIsPublishing] = useState(false);
   const [logMessages, setLogMessages] = useState<string[]>([]);
   const mqttClientRef = useRef<Client | null>(null);
+  const logScrollViewRef = useRef<ScrollView | null>(null);
 
   // MQTT connection using Paho MQTT
   useEffect(() => {
@@ -121,7 +122,14 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
   }, []);
 
   const addLog = (message: string) => {
-    setLogMessages(prev => [...prev.slice(-9), message]);
+    setLogMessages(prev => {
+      const newLogs = [...prev.slice(-9), message];
+      // Auto-scroll to bottom after a short delay
+      setTimeout(() => {
+        logScrollViewRef.current?.scrollToEnd({animated: true});
+      }, 100);
+      return newLogs;
+    });
   };
 
   const updateDay = (index: number, patch: Partial<DaySchedule>) => {
@@ -149,9 +157,16 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
       return;
     }
 
+    // Check if at least one day is enabled
+    const hasEnabledDay = schedule.some(day => day.enabled);
+    if (!hasEnabledDay) {
+      Alert.alert('Error', 'Please enable at least one day to schedule');
+      return;
+    }
+
     setIsPublishing(true);
 
-    // Build days object matching PHP format
+    // Build days object matching PHP format - only include enabled days
     const daysObj: Record<number, any> = {};
 
     schedule.forEach(day => {
@@ -182,16 +197,17 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
         mqttClientRef.current.publish(topic, message, 0);
         
         setIsPublishing(false);
-        addLog(`Published to ${topic}`);
+        addLog(`✓ Published to ${topic}`);
+        addLog(`Payload:`);
         addLog(JSON.stringify(payload, null, 2));
-        Alert.alert('Success', 'Schedule published successfully', [
-          {text: 'OK', onPress: onBack},
-        ]);
+        addLog(`--- Schedule sent successfully ---`);
+        // Show success alert but don't navigate back automatically
+        Alert.alert('Success', 'Schedule published successfully');
       }
     } catch (err: any) {
       setIsPublishing(false);
-      addLog(`Publish failed: ${err?.message || 'Unknown error'}`);
-      Alert.alert('Error', 'Failed to publish schedule');
+      addLog(`✗ Publish failed: ${err?.message || 'Unknown error'}`);
+      Alert.alert('Error', `Failed to publish schedule: ${err?.message || 'Unknown error'}`);
     }
   };
 
@@ -280,7 +296,10 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
         {logMessages.length > 0 && (
           <View style={styles.logContainer}>
             <Text style={styles.logTitle}>Log:</Text>
-            <ScrollView style={styles.logScroll}>
+            <ScrollView
+              ref={logScrollViewRef}
+              style={styles.logScroll}
+              nestedScrollEnabled={true}>
               {logMessages.map((msg, idx) => (
                 <Text key={idx} style={styles.logText}>
                   {msg}
@@ -492,7 +511,9 @@ const styles = StyleSheet.create({
     backgroundColor: BG_WHITE,
     borderRadius: 8,
     padding: 12,
-    maxHeight: 150,
+    borderWidth: 1,
+    borderColor: BORDER_COLOR,
+    maxHeight: 200,
   },
   logTitle: {
     fontSize: 14,
@@ -501,7 +522,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   logScroll: {
-    maxHeight: 120,
+    maxHeight: 170,
   },
   logText: {
     fontSize: 12,
