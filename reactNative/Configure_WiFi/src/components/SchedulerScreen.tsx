@@ -233,7 +233,7 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
             <MyKeepLogo size={28} />
           </View>
         )}
-        <Text style={styles.headerTitle}>Weekly Scheduler</Text>
+        <Text style={styles.headerTitle}>The Mella</Text>
       </View>
 
       <ScrollView
