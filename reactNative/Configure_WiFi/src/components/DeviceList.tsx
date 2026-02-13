@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { colors } from '../theme/colors';
 
 const DEVICE_STORAGE_KEY = '@saved_devices';
 
@@ -89,16 +90,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   deviceItem: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     padding: 16,
     marginBottom: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
   },
@@ -108,21 +109,21 @@ const styles = StyleSheet.create({
   deviceName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: colors.primary,
     marginBottom: 4,
   },
   deviceStatus: {
     fontSize: 12,
-    color: '#4CAF50',
+    color: colors.success,
   },
   removeButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 6,
-    backgroundColor: '#ff4444',
+    borderRadius: 8,
+    backgroundColor: colors.error,
   },
   removeButtonText: {
-    color: '#fff',
+    color: colors.buttonTextOnPrimary,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.secondary,
     textAlign: 'center',
   },
 });

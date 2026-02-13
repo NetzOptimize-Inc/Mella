@@ -98,7 +98,7 @@ const MyKeepSettingsScreen: React.FC<MyKeepSettingsScreenProps> = ({
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}>
-        <Section title="NOTIFICATIONS">
+        {/* <Section title="NOTIFICATIONS">
           {renderSettingRow(
             <MaterialCommunityIcons name="bell-outline" size={24} color={ACCENT_ORANGE} />,
             'Package Delivery Alerts',
@@ -110,7 +110,7 @@ const MyKeepSettingsScreen: React.FC<MyKeepSettingsScreenProps> = ({
               thumbColor={BG_WHITE}
             />,
           )}
-        </Section>
+        </Section> */}
 
         <Section title="DEVICE SETTINGS">
           {renderSettingRow(

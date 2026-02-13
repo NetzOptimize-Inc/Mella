@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
+import { colors } from '../theme/colors';
 
 interface InstructionsScreenProps {
   onOk: () => void;
@@ -87,7 +88,7 @@ const InstructionsScreen: React.FC<InstructionsScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: 20,
@@ -100,27 +101,27 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.primary,
   },
   content: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
   },
   instructionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: colors.primary,
     marginBottom: 12,
   },
   instructionText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.secondary,
     marginBottom: 24,
     lineHeight: 24,
   },
@@ -136,8 +137,8 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#007AFF',
-    color: '#fff',
+    backgroundColor: colors.buttonPrimary,
+    color: colors.buttonTextOnPrimary,
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -147,26 +148,26 @@ const styles = StyleSheet.create({
   stepText: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: colors.primary,
     lineHeight: 24,
     paddingTop: 4,
   },
   noteContainer: {
-    backgroundColor: '#fff3cd',
+    backgroundColor: colors.warningBg,
     borderRadius: 8,
     padding: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#ffc107',
+    borderLeftColor: colors.warningBorder,
   },
   noteTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#856404',
+    color: colors.warningText,
     marginBottom: 8,
   },
   noteText: {
     fontSize: 14,
-    color: '#856404',
+    color: colors.warningText,
     lineHeight: 20,
   },
   buttonContainer: {
@@ -174,31 +175,31 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background,
     padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
   },
   okButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.buttonPrimary,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
     marginBottom: 12,
   },
   okButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: colors.buttonTextOnPrimary,
+    fontSize: 17,
+    fontWeight: '700',
   },
   cancelButton: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.buttonSecondary,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#333',
+    color: colors.buttonTextOnSecondary,
     fontSize: 16,
     fontWeight: '600',
   },

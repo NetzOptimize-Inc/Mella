@@ -25,6 +25,7 @@ import MyKeepSetupScreen from './src/components/MyKeepSetupScreen';
 import MyKeepSettingsScreen from './src/components/MyKeepSettingsScreen';
 import MyKeepAccountScreen from './src/components/MyKeepAccountScreen';
 import MyKeepDevicesScreen from './src/components/MyKeepDevicesScreen';
+import { colors } from './src/theme/colors';
 
 const DEVICE_STORAGE_KEY = '@saved_devices';
 
@@ -294,20 +295,42 @@ const App = () => {
     <SafeAreaView style={styles.safeArea}>
       {currentScreen === 'home' && renderHomeScreen()}
 
-      {currentScreen === 'mella' &&
-        (myKeepTab === 'settings' ? (
-          <MyKeepSettingsScreen onTab={setMyKeepTab} />
-        ) : myKeepTab === 'account' ? (
-          <MyKeepAccountScreen onTab={setMyKeepTab} />
-        ) : myKeepTab === 'devices' ? (
-          <MyKeepDevicesScreen onTab={setMyKeepTab} />
-        ) : (
-          <MyKeepSetupScreen
-            onNext={handleAddDevice}
-            onTab={setMyKeepTab}
-            activeTab={myKeepTab}
-          />
-        ))}
+      {currentScreen === 'mella' && (
+        <View style={styles.mellaTabsContainer}>
+          <View
+            style={[
+              styles.mellaTabPage,
+              myKeepTab !== 'setup' && styles.mellaTabPageHidden,
+            ]}>
+            <MyKeepSetupScreen
+              onNext={handleAddDevice}
+              onTab={setMyKeepTab}
+              activeTab={myKeepTab}
+            />
+          </View>
+          <View
+            style={[
+              styles.mellaTabPage,
+              myKeepTab !== 'devices' && styles.mellaTabPageHidden,
+            ]}>
+            <MyKeepDevicesScreen onTab={setMyKeepTab} />
+          </View>
+          <View
+            style={[
+              styles.mellaTabPage,
+              myKeepTab !== 'settings' && styles.mellaTabPageHidden,
+            ]}>
+            <MyKeepSettingsScreen onTab={setMyKeepTab} />
+          </View>
+          <View
+            style={[
+              styles.mellaTabPage,
+              myKeepTab !== 'account' && styles.mellaTabPageHidden,
+            ]}>
+            <MyKeepAccountScreen onTab={setMyKeepTab} />
+          </View>
+        </View>
+      )}
 
       {currentScreen === 'instructions' && (
         <InstructionsScreen
@@ -334,7 +357,7 @@ const App = () => {
       <Modal transparent visible={isConnecting} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <ActivityIndicator size="large" color="#007AFF" />
+            <ActivityIndicator size="large" color={colors.accent} />
             <Text style={styles.modalText}>Sending credentials...</Text>
             <Text style={styles.modalSubtext}>
               Please wait while we configure the device
@@ -349,49 +372,65 @@ const App = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.surface,
+  },
+  mellaTabsContainer: {
+    flex: 1,
+  },
+  mellaTabPage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
+  },
+  mellaTabPageHidden: {
+    opacity: 0,
+    pointerEvents: 'none',
+    zIndex: 0,
   },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background,
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     padding: 20,
     paddingTop: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
   appTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.primary,
     marginBottom: 4,
   },
   appSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: colors.secondary,
   },
   content: {
     flex: 1,
     padding: 20,
   },
   addDeviceButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.buttonPrimary,
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
     marginBottom: 24,
-    shadowColor: '#007AFF',
+    shadowColor: colors.accent,
     shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 5,
   },
   addDeviceButtonText: {
-    color: '#fff',
+    color: colors.buttonTextOnPrimary,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   deviceListContainer: {
     flex: 1,
@@ -399,17 +438,17 @@ const styles = StyleSheet.create({
   deviceListTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: colors.primary,
     marginBottom: 16,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 30,
     alignItems: 'center',
@@ -419,12 +458,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.primary,
   },
   modalSubtext: {
     marginTop: 8,
     fontSize: 14,
-    color: '#666',
+    color: colors.secondary,
     textAlign: 'center',
   },
 });

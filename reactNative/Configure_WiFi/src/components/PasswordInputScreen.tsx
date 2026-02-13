@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import { colors } from '../theme/colors';
 
 interface PasswordInputScreenProps {
   networkSSID: string;
@@ -50,7 +51,7 @@ const PasswordInputScreen: React.FC<PasswordInputScreenProps> = ({
             <TextInput
               style={styles.input}
               placeholder="Enter password (leave empty for open networks)"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.placeholder}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -83,7 +84,7 @@ const PasswordInputScreen: React.FC<PasswordInputScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: 20,
@@ -95,21 +96,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.primary,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#007AFF',
+    color: colors.accent,
     fontWeight: '600',
   },
   form: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
   },
@@ -119,47 +120,47 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: colors.primary,
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: colors.border,
+    borderRadius: 10,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
-    color: '#333',
+    backgroundColor: colors.surface,
+    color: colors.primary,
     marginBottom: 8,
   },
   hint: {
     fontSize: 12,
-    color: '#666',
+    color: colors.secondary,
     fontStyle: 'italic',
   },
   buttonContainer: {
     marginTop: 8,
   },
   submitButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.buttonPrimary,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
     marginBottom: 12,
   },
   submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: colors.buttonTextOnPrimary,
+    fontSize: 17,
+    fontWeight: '700',
   },
   cancelButton: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.buttonSecondary,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#333',
+    color: colors.buttonTextOnSecondary,
     fontSize: 16,
     fontWeight: '600',
   },

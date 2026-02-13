@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MyKeepLogo from './MyKeepLogo';
+import { colors as themeColors } from '../theme/colors';
 // @ts-ignore - paho-mqtt types
 import {Client} from 'paho-mqtt';
 
@@ -543,12 +544,12 @@ const styles = StyleSheet.create({
   statusContainer: {
     marginTop: 12,
     padding: 12,
-    backgroundColor: '#FFF3CD',
+    backgroundColor: themeColors.warningBg,
     borderRadius: 8,
   },
   statusText: {
     fontSize: 13,
-    color: '#856404',
+    color: themeColors.warningText,
   },
 });
 

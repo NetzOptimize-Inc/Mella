@@ -11,6 +11,7 @@ import {
   PermissionsAndroid,
 } from 'react-native';
 import WifiManager from 'react-native-wifi-reborn';
+import { colors } from '../theme/colors';
 
 interface WiFiNetwork {
   SSID: string;
@@ -155,7 +156,7 @@ const WifiScanner: React.FC<WifiScannerProps> = ({onNetworkSelected, onCancel}) 
           <View style={styles.networkNameRow}>
             <Text style={styles.networkName}>{item.SSID || 'Unknown'}</Text>
             {isDeviceNetwork && (
-              <Text style={[styles.deviceBadge, {color: '#fff'}]}>Device</Text>
+              <Text style={[styles.deviceBadge, {color: colors.buttonTextOnPrimary}]}>Device</Text>
             )}
           </View>
           <Text style={styles.networkDetails}>
@@ -178,7 +179,7 @@ const WifiScanner: React.FC<WifiScannerProps> = ({onNetworkSelected, onCancel}) 
 
       {loading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color={colors.accent} />
           <Text style={styles.loadingText}>Scanning for networks...</Text>
         </View>
       )}
@@ -223,7 +224,7 @@ const WifiScanner: React.FC<WifiScannerProps> = ({onNetworkSelected, onCancel}) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background,
     padding: 16,
   },
   header: {
@@ -233,12 +234,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.primary,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    color: colors.secondary,
   },
   loadingContainer: {
     flex: 1,
@@ -248,23 +249,23 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#666',
+    color: colors.secondary,
   },
   list: {
     flex: 1,
     marginBottom: 16,
   },
   networkItem: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     padding: 16,
     marginBottom: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
   },
@@ -279,11 +280,11 @@ const styles = StyleSheet.create({
   networkName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: colors.primary,
     flex: 1,
   },
   deviceBadge: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.accent,
     fontSize: 10,
     fontWeight: '600',
     paddingHorizontal: 8,
@@ -294,28 +295,28 @@ const styles = StyleSheet.create({
   },
   deviceNetworkItem: {
     borderLeftWidth: 4,
-    borderLeftColor: '#007AFF',
+    borderLeftColor: colors.accent,
   },
   networkDetails: {
     fontSize: 12,
-    color: '#666',
+    color: colors.secondary,
   },
   selectArrow: {
     fontSize: 24,
-    color: '#007AFF',
+    color: colors.accent,
     fontWeight: 'bold',
   },
   scanButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.buttonPrimary,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
     marginBottom: 12,
   },
   scanButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: colors.buttonTextOnPrimary,
+    fontSize: 17,
+    fontWeight: '700',
   },
   emptyContainer: {
     flex: 1,
@@ -324,17 +325,17 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.secondary,
     marginBottom: 20,
   },
   cancelButton: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.buttonSecondary,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#333',
+    color: colors.buttonTextOnSecondary,
     fontSize: 16,
     fontWeight: '600',
   },
