@@ -42,7 +42,7 @@ const MyKeepSetupScreen: React.FC<MyKeepSetupScreenProps> = ({
         <View style={styles.logoIcon}>
           <MyKeepLogo size={28} />
         </View>
-        <Text style={styles.headerTitle}>MyKeep</Text>
+        <Text style={styles.headerTitle}>The Mella</Text>
       </View>
 
       {/* Progress stepper */}
@@ -63,7 +63,7 @@ const MyKeepSetupScreen: React.FC<MyKeepSetupScreenProps> = ({
           </View>
           <Text style={styles.stepTitle}>Switch On the Product</Text>
           <Text style={styles.stepDescription}>
-            Press the power button on your MyKeep box to turn it on.
+            Press the power button on your Mella box to turn it on.
           </Text>
         </View>
       </ScrollView>

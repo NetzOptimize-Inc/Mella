@@ -239,7 +239,7 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={true}>
-        <Text style={styles.screenTitle}>MyKeep – Weekly Scheduler</Text>
+        <Text style={styles.screenTitle}>The Mella – Weekly Scheduler</Text>
 
         <View style={styles.fieldRow}>
           <Text style={styles.label}>Device ID:</Text>

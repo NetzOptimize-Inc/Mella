@@ -91,7 +91,7 @@ const MyKeepSettingsScreen: React.FC<MyKeepSettingsScreenProps> = ({
         <View style={styles.logoIcon}>
           <MyKeepLogo size={28} />
         </View>
-        <Text style={styles.headerTitle}>MyKeep</Text>
+        <Text style={styles.headerTitle}>The Mella</Text>
       </View>
 
       <ScrollView
@@ -116,7 +116,7 @@ const MyKeepSettingsScreen: React.FC<MyKeepSettingsScreenProps> = ({
           {renderSettingRow(
             <MaterialCommunityIcons name="wifi" size={24} color={ACCENT_ORANGE} />,
             'WiFi Password',
-            'Change MyKeep box WiFi password',
+            'Change Mella box WiFi password',
           )}
           {renderSettingRow(
             <MaterialCommunityIcons name="lock-outline" size={24} color={ACCENT_ORANGE} />,
@@ -148,8 +148,8 @@ const MyKeepSettingsScreen: React.FC<MyKeepSettingsScreenProps> = ({
         </Section>
 
         <View style={styles.footer}>
-          <Text style={styles.footerVersion}>MyKeep Mobile App v1.0.0</Text>
-          <Text style={styles.footerCopyright}>© 2024 MyKeep. All rights reserved.</Text>
+          <Text style={styles.footerVersion}>The Mella Mobile App v1.0.0</Text>
+          <Text style={styles.footerCopyright}>© 2024 Mella. All rights reserved.</Text>
         </View>
       </ScrollView>
 

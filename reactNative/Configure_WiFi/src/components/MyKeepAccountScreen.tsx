@@ -67,7 +67,7 @@ const MyKeepAccountScreen: React.FC<MyKeepAccountScreenProps> = ({onTab}) => {
         <View style={styles.logoIcon}>
           <MyKeepLogo size={28} />
         </View>
-        <Text style={styles.headerTitle}>MyKeep</Text>
+        <Text style={styles.headerTitle}>The Mella</Text>
       </View>
 
       <ScrollView
@@ -131,12 +131,13 @@ const MyKeepAccountScreen: React.FC<MyKeepAccountScreenProps> = ({onTab}) => {
         </Section>
 
         <View style={styles.accountFooter}>
-          <Text style={styles.accountFooterTitle}>MyKeep Account Settings</Text>
+          <Text style={styles.accountFooterTitle}>The Mella Account Settings</Text>
           <Text style={styles.accountFooterLine}>
             For account assistance, contact{' '}
             <Text
               style={styles.accountFooterLink}
-              onPress={() => Linking.openURL('mailto:support@mykeep.com')}>
+              
+              onPress={() => Linking.openURL('mailto:support@themella.com')}>
               support@themella.com
             </Text>
           </Text>

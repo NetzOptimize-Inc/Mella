@@ -34,12 +34,12 @@ interface WiFiNetwork {
   level?: number;
 }
 
-type Screen = 'home' | 'mykeep' | 'instructions' | 'scanner' | 'password';
+type Screen = 'home' | 'mella' | 'instructions' | 'scanner' | 'password';
 
 type MyKeepTab = 'setup' | 'devices' | 'settings' | 'account';
 
 const App = () => {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('mykeep');
+  const [currentScreen, setCurrentScreen] = useState<Screen>('mella');
   const [myKeepTab, setMyKeepTab] = useState<MyKeepTab>('setup');
   const [selectedNetwork, setSelectedNetwork] = useState<WiFiNetwork | null>(
     null,
@@ -230,7 +230,7 @@ const App = () => {
           {
             text: 'OK',
             onPress: () => {
-              resetToMyKeep();
+              resetToMella();
             },
           },
         ],
@@ -241,7 +241,7 @@ const App = () => {
         'Warning',
         'Device configured but failed to save device name.',
       );
-      resetToMyKeep();
+      resetToMella();
     }
   };
 
@@ -252,9 +252,9 @@ const App = () => {
     loadSavedDevices();
   };
 
-  /** Return to MyKeep main UI (Setup tab) after cancel or success in add-device flow. */
-  const resetToMyKeep = () => {
-    setCurrentScreen('mykeep');
+  /** Return to Mella main UI (Setup tab) after cancel or success in add-device flow. */
+  const resetToMella = () => {
+    setCurrentScreen('mella');
     setSelectedNetwork(null);
     setIsConnecting(false);
     loadSavedDevices();
@@ -294,7 +294,7 @@ const App = () => {
     <SafeAreaView style={styles.safeArea}>
       {currentScreen === 'home' && renderHomeScreen()}
 
-      {currentScreen === 'mykeep' &&
+      {currentScreen === 'mella' &&
         (myKeepTab === 'settings' ? (
           <MyKeepSettingsScreen onTab={setMyKeepTab} />
         ) : myKeepTab === 'account' ? (
@@ -312,14 +312,14 @@ const App = () => {
       {currentScreen === 'instructions' && (
         <InstructionsScreen
           onOk={handleInstructionsOk}
-          onCancel={resetToMyKeep}
+          onCancel={resetToMella}
         />
       )}
 
       {currentScreen === 'scanner' && (
         <WifiScanner
           onNetworkSelected={handleNetworkSelected}
-          onCancel={resetToMyKeep}
+          onCancel={resetToMella}
         />
       )}
 
@@ -327,7 +327,7 @@ const App = () => {
         <PasswordInputScreen
           networkSSID={selectedNetwork.SSID}
           onSubmit={handlePasswordEntered}
-          onCancel={resetToMyKeep}
+          onCancel={resetToMella}
         />
       )}
 
