@@ -17,7 +17,7 @@ const MyKeepLogo: React.FC<MyKeepLogoProps> = ({size = 28}) => {
       source={MY_KEEP_LOGO}
       style={[styles.logo, {width: size, height: size}]}
       resizeMode="contain"
-      accessibilityLabel="MyKeep"
+      accessibilityLabel="The Mella"
     />
   );
 };

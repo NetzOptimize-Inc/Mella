@@ -137,7 +137,7 @@ const MyKeepAccountScreen: React.FC<MyKeepAccountScreenProps> = ({onTab}) => {
             <Text
               style={styles.accountFooterLink}
               onPress={() => Linking.openURL('mailto:support@mykeep.com')}>
-              support@mykeep.com
+              support@themella.com
             </Text>
           </Text>
         </View>

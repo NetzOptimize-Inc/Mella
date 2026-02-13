@@ -95,10 +95,6 @@ const App = () => {
     setCurrentScreen('instructions');
   };
 
-  const handleMyKeepNext = () => {
-    // Setup flow steps will be added later
-  };
-
   const handleInstructionsOk = () => {
     // After user clicks OK on instructions, show WiFi scanner
     setCurrentScreen('scanner');
@@ -234,7 +230,7 @@ const App = () => {
           {
             text: 'OK',
             onPress: () => {
-              resetToHome();
+              resetToMyKeep();
             },
           },
         ],
@@ -245,12 +241,20 @@ const App = () => {
         'Warning',
         'Device configured but failed to save device name.',
       );
-      resetToHome();
+      resetToMyKeep();
     }
   };
 
   const resetToHome = () => {
     setCurrentScreen('home');
+    setSelectedNetwork(null);
+    setIsConnecting(false);
+    loadSavedDevices();
+  };
+
+  /** Return to MyKeep main UI (Setup tab) after cancel or success in add-device flow. */
+  const resetToMyKeep = () => {
+    setCurrentScreen('mykeep');
     setSelectedNetwork(null);
     setIsConnecting(false);
     loadSavedDevices();
@@ -299,7 +303,7 @@ const App = () => {
           <MyKeepDevicesScreen onTab={setMyKeepTab} />
         ) : (
           <MyKeepSetupScreen
-            onNext={handleMyKeepNext}
+            onNext={handleAddDevice}
             onTab={setMyKeepTab}
             activeTab={myKeepTab}
           />
@@ -308,14 +312,14 @@ const App = () => {
       {currentScreen === 'instructions' && (
         <InstructionsScreen
           onOk={handleInstructionsOk}
-          onCancel={resetToHome}
+          onCancel={resetToMyKeep}
         />
       )}
 
       {currentScreen === 'scanner' && (
         <WifiScanner
           onNetworkSelected={handleNetworkSelected}
-          onCancel={resetToHome}
+          onCancel={resetToMyKeep}
         />
       )}
 
@@ -323,7 +327,7 @@ const App = () => {
         <PasswordInputScreen
           networkSSID={selectedNetwork.SSID}
           onSubmit={handlePasswordEntered}
-          onCancel={resetToHome}
+          onCancel={resetToMyKeep}
         />
       )}
 
