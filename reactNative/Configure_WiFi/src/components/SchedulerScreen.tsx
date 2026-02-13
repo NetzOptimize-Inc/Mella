@@ -19,6 +19,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MyKeepLogo from './MyKeepLogo';
 // @ts-ignore - paho-mqtt types
 import {Client} from 'paho-mqtt';
 
@@ -49,12 +50,15 @@ interface SchedulerScreenProps {
   onBack: () => void;
   onSchedule?: (deviceId: string, schedule: DaySchedule[]) => void;
   initialDeviceId?: string;
+  /** When true (default), show back button. When false, e.g. embedded in Scheduler tab, show logo only. */
+  showBackButton?: boolean;
 }
 
 const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
   onBack,
   onSchedule,
   initialDeviceId = 'df72',
+  showBackButton = true,
 }) => {
   const [deviceId, setDeviceId] = useState(initialDeviceId);
   const [schedule, setSchedule] = useState<DaySchedule[]>(() =>
@@ -219,9 +223,15 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
   return (
     <View style={styles.outer}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backBtn} hitSlop={12}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color={PRIMARY_GREY} />
-        </TouchableOpacity>
+        {showBackButton ? (
+          <TouchableOpacity onPress={onBack} style={styles.backBtn} hitSlop={12}>
+            <MaterialCommunityIcons name="arrow-left" size={24} color={PRIMARY_GREY} />
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.backBtn}>
+            <MyKeepLogo size={28} />
+          </View>
+        )}
         <Text style={styles.headerTitle}>Weekly Scheduler</Text>
       </View>
 

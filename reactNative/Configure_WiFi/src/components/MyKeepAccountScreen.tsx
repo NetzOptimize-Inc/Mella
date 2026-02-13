@@ -155,8 +155,8 @@ const MyKeepAccountScreen: React.FC<MyKeepAccountScreenProps> = ({onTab}) => {
           style={styles.navItem}
           onPress={() => onTab?.('devices')}
           activeOpacity={0.7}>
-          <MaterialCommunityIcons name="cube-outline" size={24} color={PRIMARY_GREY} style={styles.navIcon} />
-          <Text style={styles.navLabel}>Devices</Text>
+          <MaterialCommunityIcons name="calendar-clock" size={24} color={PRIMARY_GREY} style={styles.navIcon} />
+          <Text style={styles.navLabel}>Scheduler</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}

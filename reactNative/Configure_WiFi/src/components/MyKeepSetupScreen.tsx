@@ -103,7 +103,7 @@ const MyKeepSetupScreen: React.FC<MyKeepSetupScreenProps> = ({
           onPress={() => onTab?.('devices')}
           activeOpacity={0.7}>
           <MaterialCommunityIcons
-            name="cube-outline"
+            name="calendar-clock"
             size={24}
             color={activeTab === 'devices' ? ACCENT_ORANGE : PRIMARY_GREY}
             style={styles.navIcon}
@@ -113,7 +113,7 @@ const MyKeepSetupScreen: React.FC<MyKeepSetupScreenProps> = ({
               styles.navLabel,
               activeTab === 'devices' && styles.navLabelActive,
             ]}>
-            Devices
+            Scheduler
           </Text>
         </TouchableOpacity>
         <TouchableOpacity

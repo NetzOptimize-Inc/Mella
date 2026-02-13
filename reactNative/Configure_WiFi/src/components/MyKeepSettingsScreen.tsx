@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MyKeepLogo from './MyKeepLogo';
-import SchedulerScreen from './SchedulerScreen';
 
 const ACCENT_ORANGE = '#FF6600';
 const PRIMARY_GREY = '#333333';
@@ -36,7 +35,6 @@ const MyKeepSettingsScreen: React.FC<MyKeepSettingsScreenProps> = ({
 }) => {
   const [packageAlerts, setPackageAlerts] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
-  const [showScheduler, setShowScheduler] = useState(false);
 
   const renderSettingRow = (
     icon: React.ReactNode,
@@ -86,18 +84,6 @@ const MyKeepSettingsScreen: React.FC<MyKeepSettingsScreenProps> = ({
     </View>
   );
 
-  if (showScheduler) {
-    return (
-      <SchedulerScreen
-        onBack={() => setShowScheduler(false)}
-        onSchedule={(deviceId, schedule) => {
-          // Optional: persist or send to device
-          setShowScheduler(false);
-        }}
-      />
-    );
-  }
-
   return (
     <View style={styles.outer}>
       {/* Header - white */}
@@ -136,12 +122,6 @@ const MyKeepSettingsScreen: React.FC<MyKeepSettingsScreenProps> = ({
             <MaterialCommunityIcons name="lock-outline" size={24} color={ACCENT_ORANGE} />,
             'Security',
             'View and manage security settings',
-          )}
-          {renderTappableRow(
-            <MaterialCommunityIcons name="calendar-clock" size={24} color={ACCENT_ORANGE} />,
-            'Scheduler',
-            'Configure weekly schedule',
-            () => setShowScheduler(true),
           )}
         </Section>
 
@@ -186,8 +166,8 @@ const MyKeepSettingsScreen: React.FC<MyKeepSettingsScreenProps> = ({
           style={styles.navItem}
           onPress={() => onTab?.('devices')}
           activeOpacity={0.7}>
-          <MaterialCommunityIcons name="cube-outline" size={24} color={PRIMARY_GREY} style={styles.navIcon} />
-          <Text style={styles.navLabel}>Devices</Text>
+          <MaterialCommunityIcons name="calendar-clock" size={24} color={PRIMARY_GREY} style={styles.navIcon} />
+          <Text style={styles.navLabel}>Scheduler</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.navItem, styles.navItemActive]}
