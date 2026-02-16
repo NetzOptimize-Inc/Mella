@@ -1,0 +1,26 @@
+{"version":1,"enabled":true,"days":{"0":{"en":false},"1":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"2":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"3":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"4":{"en":true,"sh":9,"sm":0,"eh":12,"em":0},"5":{"en":false},"6":{"en":false}}}
+
+
+{"version":1,"enabled":true,"days":{"0":{"en":false},"1":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"2":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"3":{"en":true,"sh":9,"sm":0,"eh":18,"em":0}}}
+
+
+
+{"version":1,"enabled":true,"days":{"0":{"en":false},"1":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"3":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"4":{"en":true,"sh":9,"sm":0,"eh":12,"em":0},"5":{"en":false},"6":{"en":false}}}
+
+
+Worked:
+{"version":1,"enabled":true,"days":{"0":{"en":false},"1":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"2":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"3":{"en":true,"sh":9,"sm":0,"eh":18,"em":0}}}
+
+
+
+Didn't work:
+{"version":1,"enabled":true,"days":{"0":{"en":false},"1":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"2":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"3":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"4":{"en":true,"sh":9,"sm":0,"eh":12,"em":0}}}
+
+
+Worked:
+{"version":1,"enabled":true,"days":{"0":{"en":false},"1":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"2":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"3":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"5":{"en":false},"6":{"en":false}}}
+
+
+didn't work:
+
+{"version":1,"enabled":true,"days":{"0":{"en":false},"1":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"2":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"3":{"en":true,"sh":9,"sm":0,"eh":18,"em":0},"4":{"en":true,"sh":9,"sm":0,"eh":12,"em":0},"5":{"en":false},"6":{"en":false}}}
