@@ -76,8 +76,10 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
     rowIndex: number;
     field: 'start' | 'end';
   } | null>(null);
+  const [epoch, setEpoch] = useState('1770035940');
   const [mqttConnected, setMqttConnected] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isSendingEpoch, setIsSendingEpoch] = useState(false);
   const [logMessages, setLogMessages] = useState<string[]>([]);
   const mqttClientRef = useRef<Client | null>(null);
   const logScrollViewRef = useRef<ScrollView | null>(null);
@@ -216,6 +218,44 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
     }
   };
 
+  const handleSendEpoch = () => {
+    const trimmedDeviceId = deviceId.trim();
+    if (!trimmedDeviceId) {
+      Alert.alert('Error', 'Please enter Device ID');
+      return;
+    }
+    if (!mqttConnected || !mqttClientRef.current || !mqttClientRef.current.isConnected()) {
+      Alert.alert('Error', 'MQTT not connected. Please wait...');
+      return;
+    }
+
+    const epochNum = parseInt(epoch.trim(), 10);
+    if (Number.isNaN(epochNum)) {
+      Alert.alert('Error', 'Please enter a valid epoch number');
+      return;
+    }
+
+    setIsSendingEpoch(true);
+    const payload = {version: 1, epoch: epochNum};
+    const topic = `mella/${trimmedDeviceId}/cmd/epoch`;
+    const message = JSON.stringify(payload);
+
+    try {
+      if (mqttClientRef.current) {
+        mqttClientRef.current.publish(topic, message, 0);
+        setIsSendingEpoch(false);
+        addLog(`✓ Published to ${topic}`);
+        addLog(JSON.stringify(payload));
+        addLog('--- Epoch sent successfully ---');
+        Alert.alert('Success', 'Epoch published successfully');
+      }
+    } catch (err: any) {
+      setIsSendingEpoch(false);
+      addLog(`✗ Epoch publish failed: ${err?.message || 'Unknown error'}`);
+      Alert.alert('Error', `Failed to publish: ${err?.message || 'Unknown error'}`);
+    }
+  };
+
   const openTimeModal = (rowIndex: number, field: 'start' | 'end') => {
     setTimeModal({visible: true, rowIndex, field});
   };
@@ -251,6 +291,32 @@ const SchedulerScreen: React.FC<SchedulerScreenProps> = ({
             placeholder="Device ID"
             placeholderTextColor={SECONDARY_GREY}
           />
+        </View>
+
+        <View style={styles.epochRow}>
+          <Text style={styles.label}>Epoch:</Text>
+          <TextInput
+            style={styles.epochInput}
+            value={epoch}
+            onChangeText={setEpoch}
+            placeholder="Epoch"
+            placeholderTextColor={SECONDARY_GREY}
+            keyboardType="number-pad"
+          />
+          <TouchableOpacity
+            style={[
+              styles.sendEpochButton,
+              (!mqttConnected || isSendingEpoch) && styles.scheduleButtonDisabled,
+            ]}
+            onPress={handleSendEpoch}
+            disabled={!mqttConnected || isSendingEpoch}
+            activeOpacity={0.85}>
+            {isSendingEpoch ? (
+              <ActivityIndicator color={BG_WHITE} size="small" />
+            ) : (
+              <Text style={styles.sendEpochButtonText}>Send</Text>
+            )}
+          </TouchableOpacity>
         </View>
 
         <View style={styles.tableWrap}>
@@ -417,6 +483,38 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 16,
     color: PRIMARY_GREY,
+  },
+  epochRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 10,
+  },
+  epochInput: {
+    flex: 1,
+    backgroundColor: BG_WHITE,
+    borderWidth: 1,
+    borderColor: BORDER_COLOR,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    color: PRIMARY_GREY,
+    minWidth: 0,
+  },
+  sendEpochButton: {
+    backgroundColor: ACCENT_ORANGE,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    justifyContent: 'center',
+    minWidth: 72,
+    alignItems: 'center',
+  },
+  sendEpochButtonText: {
+    color: BG_WHITE,
+    fontSize: 16,
+    fontWeight: '700',
   },
   tableWrap: {
     backgroundColor: BG_WHITE,
